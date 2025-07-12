@@ -1,0 +1,23 @@
+{
+  "name": "debate-transcripts",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/garetht/debate-transcripts#readme",
+  "bugs": {
+    "url": "https://github.com/garetht/debate-transcripts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/garetht/debate-transcripts.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "format": "pprettier --write \"transcripts/**/*.json\""
+  },
+  "devDependencies": {
+    "@mixer/parallel-prettier": "^2.0.3"
+  }
+}

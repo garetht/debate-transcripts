@@ -1,0 +1,71 @@
+[
+  { "untrained-mega-llama": 0 },
+  {
+    "untrained-mega-llama": {
+      "matches": 400,
+      "wins": 200.0,
+      "binary_wins": 200,
+      "binary_win_pct": 0.5,
+      "correct_matches": 200,
+      "correct_wins": 102.5959992351377,
+      "first_matches": 200,
+      "first_wins": 186.8992479348331,
+      "average_reward": 0.5,
+      "average_correct_reward": 0.5129799961756885,
+      "average_incorrect_reward": 0.48702000382431154,
+      "average_first_wins": 0.9344962396741656,
+      "average_second_wins": 0.06550376032583444
+    }
+  },
+  {
+    "standard": {
+      "untrained-mega-llama_v_untrained-mega-llama": {
+        "matches": 200,
+        "correct_calls": 102.5959992351377,
+        "first_calls": 186.8992479348331
+      }
+    },
+    "aggregated": {},
+    "binary": {
+      "untrained-mega-llama_v_untrained-mega-llama": {
+        "matches": 200,
+        "correct_calls": 98,
+        "first_calls": 194
+      }
+    }
+  },
+  {
+    "untrained-mega-llama": {
+      "Overall": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      },
+      "Correct": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      },
+      "Winner": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      },
+      "Loser": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      },
+      "Incorrect": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      }
+    }
+  }
+]

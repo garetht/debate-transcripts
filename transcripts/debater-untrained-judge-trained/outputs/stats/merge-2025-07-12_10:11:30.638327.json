@@ -1,0 +1,98 @@
+[
+  {
+    "untrained-mega-llama": 0
+  },
+  {
+    "untrained-mega-llama": {
+      "matches": 1200,
+      "wins": 600.0,
+      "binary_wins": 600,
+      "binary_win_pct": 0.5,
+      "correct_matches": 600,
+      "correct_wins": 320.7979463214851,
+      "first_matches": 600,
+      "first_wins": 558.982489632907,
+      "average_reward": 0.5,
+      "average_correct_reward": 0.5346632438691418,
+      "average_incorrect_reward": 0.46469413633527645,
+      "average_first_wins": 0.9316374827215117,
+      "average_second_wins": 0.06836251727848833
+    }
+  },
+  {
+    "standard": {
+      "untrained-mega-llama_v_untrained-mega-llama": {
+        "matches": 600,
+        "correct_calls": 320.7979463214851,
+        "first_calls": 558.982489632907
+      }
+    },
+    "aggregated": {},
+    "binary": {
+      "untrained-mega-llama_v_untrained-mega-llama": {
+        "matches": 600,
+        "correct_calls": 311,
+        "first_calls": 574
+      }
+    }
+  },
+  {
+    "untrained-mega-llama": {
+      "Overall": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "Correct": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "Winner": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "Loser": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "Incorrect": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      }
+    }
+  }
+]
