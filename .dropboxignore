@@ -1,0 +1,7 @@
+# ----
+# Automatically Generated .dropboxignore file at Mon Jul 28 14:23:28 EDT 2025
+# ----
+.DS_Store
+.idea
+node_modules
+# ----
