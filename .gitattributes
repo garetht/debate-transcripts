@@ -1,1 +1,7 @@
 *.jsonl filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-13T17-34-42+00-00_lojban-simple-baseline_aoYBjCjifEPRJVYCfkD92u.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-13T17-34-42+00-00_lojban-simple-baseline_oLG6ShDCJmD7sJdet8uZCd.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-13T17-38-59+00-00_lojban-simple-baseline_cAHuCrqVjRSQptc9iS4HPV.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-13T18-35-59+00-00_quality-debater-simple-baseline_AaT3QcdhS7PEXg9goFhLYT.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-13T18-35-59+00-00_quality-debater-simple-baseline_RrLrfMvksT6nuMbvukSJnS.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-13T19-10-37+00-00_quality-judge-simple-baseline_iR7gvxgTvNQLALtAXydduM.json filter=lfs diff=lfs merge=lfs -text
