@@ -5,3 +5,6 @@ transcripts/inspect_logs/2025-09-13T17-38-59+00-00_lojban-simple-baseline_cAHuCr
 transcripts/inspect_logs/2025-09-13T18-35-59+00-00_quality-debater-simple-baseline_AaT3QcdhS7PEXg9goFhLYT.json filter=lfs diff=lfs merge=lfs -text
 transcripts/inspect_logs/2025-09-13T18-35-59+00-00_quality-debater-simple-baseline_RrLrfMvksT6nuMbvukSJnS.json filter=lfs diff=lfs merge=lfs -text
 transcripts/inspect_logs/2025-09-13T19-10-37+00-00_quality-judge-simple-baseline_iR7gvxgTvNQLALtAXydduM.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-14T16-54-06+00-00_lojban-simple-baseline_R2qsHNVMxvmzsyB6MojfUV.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-14T16-54-06+00-00_lojban-simple-baseline_87TVXhoBkbwvRZCUQcJ2WP.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-14T16-55-18+00-00_lojban-simple-baseline_fiSKmgbQsS6N3D88vpR3Vp.json filter=lfs diff=lfs merge=lfs -text
