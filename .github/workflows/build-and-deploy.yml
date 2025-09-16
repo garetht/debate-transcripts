@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: python:3.11-slim  # or python:3.11, python:3.11-alpine
+      image: python:3.11  # or python:3.11, python:3.11-alpine
     steps:
       - name: Checkout
         uses: actions/checkout@v4
