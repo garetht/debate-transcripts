@@ -1,0 +1,71 @@
+[
+  { "openai-o4-debater": 0 },
+  {
+    "openai-o4-debater": {
+      "matches": 5974,
+      "wins": 2987.0,
+      "binary_wins": 2987,
+      "binary_win_pct": 0.5,
+      "correct_matches": 2987,
+      "correct_wins": 1654.5769918378724,
+      "first_matches": 2987,
+      "first_wins": 1796.179067775989,
+      "average_reward": 0.5,
+      "average_correct_reward": 0.5539260099892441,
+      "average_incorrect_reward": 0.4460739900107558,
+      "average_first_wins": 0.6013321284820854,
+      "average_second_wins": 0.3986678715179146
+    }
+  },
+  {
+    "standard": {
+      "openai-o4-debater_v_openai-o4-debater": {
+        "matches": 2987,
+        "correct_calls": 1654.5769918378724,
+        "first_calls": 1796.179067775989
+      }
+    },
+    "aggregated": {},
+    "binary": {
+      "openai-o4-debater_v_openai-o4-debater": {
+        "matches": 2987,
+        "correct_calls": 1668,
+        "first_calls": 2190
+      }
+    }
+  },
+  {
+    "openai-o4-debater": {
+      "Overall": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      },
+      "Correct": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      },
+      "Winner": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      },
+      "Loser": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      },
+      "Incorrect": {
+        "number_of_quotes": 0,
+        "number_of_valid_quotes": 0,
+        "total_valid_quote_length": 0,
+        "quote_length_to_accuracy": [[0, 0]]
+      }
+    }
+  }
+]
