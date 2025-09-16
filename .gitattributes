@@ -8,3 +8,7 @@ transcripts/inspect_logs/2025-09-13T19-10-37+00-00_quality-judge-simple-baseline
 transcripts/inspect_logs/2025-09-14T16-54-06+00-00_lojban-simple-baseline_R2qsHNVMxvmzsyB6MojfUV.json filter=lfs diff=lfs merge=lfs -text
 transcripts/inspect_logs/2025-09-14T16-54-06+00-00_lojban-simple-baseline_87TVXhoBkbwvRZCUQcJ2WP.json filter=lfs diff=lfs merge=lfs -text
 transcripts/inspect_logs/2025-09-14T16-55-18+00-00_lojban-simple-baseline_fiSKmgbQsS6N3D88vpR3Vp.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-16T13-30-35-04-00_lojban-simple-baseline_8V2g4tGvtT9CRtVisa4WPY.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-16T14-42-26-04-00_quality-judge-simple-baseline_44zRCCKUYozUyuo8p7VZmU.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-16T13-19-09-04-00_quality-judge-simple-baseline_oLtYhxXXQa3WmapuhEsYmv.json filter=lfs diff=lfs merge=lfs -text
+transcripts/inspect_logs/2025-09-16T14-43-41-04-00_lojban-simple-baseline_gX4rfYNBiPWJH4WDUQZKBt.json filter=lfs diff=lfs merge=lfs -text
