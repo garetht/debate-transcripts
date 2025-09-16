@@ -31,7 +31,7 @@ jobs:
           # Install Python dependencies
           pip install --upgrade pip
           # Install other dependencies if you have a requirements.txt
-          pip install -r requirements.txt; fi
+          pip install -r requirements.txt
 
       - name: Run inspect view bundle
         run: |
