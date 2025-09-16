@@ -18,15 +18,16 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: python:3.11  # or python:3.11, python:3.11-alpine
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      # No need for setup-python when using container
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
