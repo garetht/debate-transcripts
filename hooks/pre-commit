@@ -8,25 +8,8 @@ staged_json_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.js
 
 if [ -n "$staged_json_files" ]; then
     echo "Converting colons to double underscores in JSON filenames..."
-
-    # Convert colons to double underscores for each staged JSON file
-    echo "$staged_json_files" | while IFS= read -r file; do
-        if [ -f "$file" ]; then
-            new_name="${file//:/__}"
-            if [ "$file" != "$new_name" ]; then
-                echo "Renaming: $file -> $new_name"
-
-                # Remove the old file from staging
-                git reset HEAD "$file" >/dev/null 2>&1
-
-                # Rename the file
-                mv "$file" "$new_name"
-
-                # Add the renamed file to staging
-                git add "$new_name"
-            fi
-        fi
-    done
+    find . -type f -name "*:*" -execdir bash -c 'mv "$1" "${1//:/__}"' _ {} \;
+    git add .
 
     echo "JSON filename conversion complete."
 fi
