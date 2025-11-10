@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
 import {
+  copyFileSync,
   mkdirSync,
   readdirSync,
   readFileSync,
+  rmSync,
   statSync,
   writeFileSync,
 } from 'node:fs'
@@ -21,6 +23,7 @@ import { Project } from 'ts-morph'
 const TRANSCRIPTS_DIR = path.resolve(process.cwd(), 'transcripts')
 const DIRECTORY_PREFIX = 'eval--'
 const PARQUET_FILENAME = 'full_debate_analysis.parquet'
+const WEB_PARQUET_DIR = path.resolve(process.cwd(), 'web', 'src', 'parquet')
 
 function main(): void {
   try {
@@ -41,6 +44,7 @@ function run(): void {
   }
 
   const { filePath, schema } = loadFirstSchema(parquetFiles)
+  const mirroredFiles = mirrorParquetFiles(parquetFiles)
   const interfaceName = inferInterfaceName(PARQUET_FILENAME)
   const generatedType = generateTypeScriptSource({
     interfaceName,
@@ -78,6 +82,14 @@ function run(): void {
       `  ${columnNames.join(', ')}`,
     ].join('\n')
   )
+  if (mirroredFiles.length) {
+    console.log(
+      [
+        `Copied ${mirroredFiles.length} parquet file${mirroredFiles.length === 1 ? '' : 's'} into web/src/parquet for Vite consumption.`,
+        `  ${mirroredFiles.map(file => path.relative(process.cwd(), file)).join('\n  ')}`,
+      ].join('\n')
+    )
+  }
 }
 
 function findParquetFiles(): string[] {
@@ -128,6 +140,21 @@ function loadFirstSchema(parquetFiles: string[]): {
   return { filePath, schema }
 }
 
+function mirrorParquetFiles(parquetFiles: string[]): string[] {
+  rmSync(WEB_PARQUET_DIR, { recursive: true, force: true })
+  mkdirSync(WEB_PARQUET_DIR, { recursive: true })
+
+  const copiedPaths: string[] = []
+  for (const filePath of parquetFiles) {
+    const relativePath = path.relative(TRANSCRIPTS_DIR, filePath)
+    const destination = path.join(WEB_PARQUET_DIR, relativePath)
+    mkdirSync(path.dirname(destination), { recursive: true })
+    copyFileSync(filePath, destination)
+    copiedPaths.push(destination)
+  }
+  return copiedPaths
+}
+
 function inferInterfaceName(filename: string): string {
   const base = filename.replace(/\.parquet$/i, '')
   return `${toPascalCase(base)}Row`
@@ -168,7 +195,7 @@ function generateTypeScriptSource({
 
   sourceFile.addImportDeclaration({
     moduleSpecifier: 'hyparquet',
-    namedImports: ['asyncBufferFromFile', 'parquetReadObjects'],
+    namedImports: ['asyncBufferFromUrl', 'parquetReadObjects'],
   })
 
   sourceFile.addStatements(writer => {
@@ -195,18 +222,27 @@ function generateTypeScriptSource({
     }
   }
 
+  sourceFile.addTypeAlias({
+    name: `${interfaceName}FetchOptions`,
+    isExported: true,
+    type: "Omit<Parameters<typeof asyncBufferFromUrl>[0], 'url'>",
+  })
+
   sourceFile.addStatements(writer => {
     writer.blankLine()
   })
 
   sourceFile.addFunction({
     isExported: true,
-    name: `read${interfaceName}s`,
+    name: `fetch${interfaceName}s`,
     isAsync: true,
     returnType: `Promise<${interfaceName}[]>`,
-    parameters: [{ name: 'parquetFilePath', type: 'string' }],
+    parameters: [
+      { name: 'url', type: 'string' },
+      { name: 'options', hasQuestionToken: true, type: `${interfaceName}FetchOptions` },
+    ],
     statements: [
-      'const file = await asyncBufferFromFile(parquetFilePath);',
+      'const file = await asyncBufferFromUrl({ url, ...(options ?? {}) });',
       "const rows = await parquetReadObjects({ file, rowFormat: 'object' });",
       `return rows as ${interfaceName}[];`,
     ],
