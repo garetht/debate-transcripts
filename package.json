@@ -16,7 +16,7 @@
   "main": "index.js",
   "scripts": {
     "format": "pprettier --write \"transcripts/**/*.json\"",
-    "generate-parquet-schema": "tsx scripts/generate-parquet-schema.mts web/src/fullDebateAnalysis.generated.ts",
+    "generate-parquet-schema": "tsx scripts/generate-parquet-schema.mts web/src/fullDebateAnalysis.generated.ts"
   },
   "devDependencies": {
     "@mixer/parallel-prettier": "^2.0.3",

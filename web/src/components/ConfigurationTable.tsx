@@ -1,0 +1,207 @@
+import { useState } from 'react'
+import type { JSX } from 'react'
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnDef,
+  type SortingState,
+} from '@tanstack/react-table'
+import type { FullDebateAnalysisRow } from '../fullDebateAnalysis.generated'
+import { formatJudgeAccuracy, getJudgeAccuracyValue } from '../utils/judgeAccuracy'
+
+const columnHelper = createColumnHelper<FullDebateAnalysisRow>()
+
+const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
+  columnHelper.accessor(
+    (row) => row.configuration?.task_type?.trim() ?? '',
+    {
+      id: 'taskType',
+      header: () => 'Task Type',
+      cell: (info) => info.getValue() || '—',
+      filterFn: 'includesString',
+    }
+  ),
+  columnHelper.accessor(
+    (row) => row.configuration?.debater_name?.trim() ?? '',
+    {
+      id: 'debater',
+      header: () => 'Debater Name',
+      cell: (info) => info.getValue() || '—',
+      filterFn: 'includesString',
+      sortingFn: 'alphanumeric',
+    }
+  ),
+  columnHelper.accessor(
+    (row) => row.configuration?.debater_training_round?.trim() ?? '',
+    {
+      id: 'debaterTrainingRound',
+      header: () => 'Debater Training Round',
+      cell: (info) => info.getValue() || '—',
+      filterFn: 'includesString',
+      sortingFn: 'alphanumeric',
+    }
+  ),
+  columnHelper.accessor(
+    (row) => row.configuration?.judge_name?.trim() ?? '',
+    {
+      id: 'judge',
+      header: () => 'Judge Name',
+      cell: (info) => info.getValue() || '—',
+      filterFn: 'includesString',
+      sortingFn: 'alphanumeric',
+    }
+  ),
+  columnHelper.accessor(
+    (row) => row.configuration?.judge_training_round?.trim() ?? '',
+    {
+      id: 'judgeTrainingRound',
+      header: () => 'Judge Training Round',
+      cell: (info) => info.getValue() || '—',
+      filterFn: 'includesString',
+      sortingFn: 'alphanumeric',
+    }
+  ),
+  columnHelper.accessor(
+    (row) => getJudgeAccuracyValue(row),
+    {
+      id: 'judgeAccuracy',
+      header: () => 'Judge Accuracy',
+      cell: (info) => formatJudgeAccuracy(info.row.original),
+      enableGlobalFilter: false,
+      sortingFn: (a, b, columnId) => {
+        const valueA = a.getValue<number | null>(columnId)
+        const valueB = b.getValue<number | null>(columnId)
+        if (valueA === null && valueB === null) return 0
+        if (valueA === null) return 1
+        if (valueB === null) return -1
+        return valueA - valueB
+      },
+    }
+  ),
+]
+
+const headerClassName = 'px-4 py-3'
+const defaultCellClassName = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-200'
+const cellClassNameMap: Record<string, string> = {
+  taskType: defaultCellClassName,
+  debater: defaultCellClassName,
+  debaterTrainingRound: 'px-4 py-3 text-xs text-slate-600 dark:text-slate-300',
+  judge: defaultCellClassName,
+  judgeTrainingRound: 'px-4 py-3 text-xs text-slate-600 dark:text-slate-300',
+  judgeAccuracy: 'px-4 py-3 text-xs font-medium text-slate-500 dark:text-slate-300',
+}
+
+export function ConfigurationTable({
+  rows,
+  onSelectRow,
+}: {
+  rows: FullDebateAnalysisRow[]
+  onSelectRow: (row: FullDebateAnalysisRow) => void
+}): JSX.Element {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = useState('')
+
+  const table = useReactTable({
+    data: rows,
+    columns: tableColumns,
+    state: {
+      sorting,
+      globalFilter,
+    },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    globalFilterFn: 'includesString',
+  })
+
+  const tableRows = table.getRowModel().rows
+  const currentFilter =
+    typeof table.getState().globalFilter === 'string' ? table.getState().globalFilter : ''
+
+  return (
+    <div className="mt-4 rounded-xl border border-slate-200/60 bg-white/70 shadow-inner transition-colors dark:border-slate-700/60 dark:bg-slate-950/40">
+      <div className="flex items-center gap-2 border-b border-slate-200/60 bg-slate-100/80 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-200">
+        <span>Filter</span>
+        <input
+          value={currentFilter}
+          onChange={(event) => table.setGlobalFilter(event.target.value)}
+          placeholder="Search configuration…"
+          aria-label="Filter configuration rows"
+          className="w-full max-w-xs rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-normal text-slate-700 shadow-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-indigo-300 dark:focus:ring-indigo-500/40"
+        />
+      </div>
+      {tableRows.length > 0 ? (
+        <table className="min-w-full table-auto divide-y divide-slate-200 dark:divide-slate-800">
+          <thead className="bg-slate-100/80 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-800/60 dark:text-slate-200">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} scope="col" className={headerClassName}>
+                    {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                      <button
+                        type="button"
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="flex items-center gap-1 text-left text-slate-600 transition-colors hover:text-indigo-600 focus:outline-none focus-visible:text-indigo-600 dark:text-slate-200 dark:hover:text-indigo-200 dark:focus-visible:text-indigo-200"
+                      >
+                        <span className="uppercase tracking-wide">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </span>
+                        <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
+                          {header.column.getIsSorted() === 'asc'
+                            ? '^'
+                            : header.column.getIsSorted() === 'desc'
+                            ? 'v'
+                            : ''}
+                        </span>
+                      </button>
+                    ) : (
+                      <span className="uppercase tracking-wide">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </span>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            {tableRows.map((row) => (
+              <tr
+                key={row.id}
+                tabIndex={0}
+                role="button"
+                onClick={() => onSelectRow(row.original)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    onSelectRow(row.original)
+                  }
+                }}
+                className="cursor-pointer transition-colors hover:bg-indigo-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 dark:hover:bg-indigo-500/20"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className={cellClassNameMap[cell.column.id] ?? defaultCellClassName}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="px-4 py-5 text-sm text-slate-600 dark:text-slate-300">
+          No rows match the current filters.
+        </p>
+      )}
+    </div>
+  )
+}
