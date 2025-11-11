@@ -10,7 +10,7 @@ export function DatasetCard({
   dataset: DebateDataset
   onSelectRow: (row: FullDebateAnalysisRow, dataset: DebateDataset) => void
 }): JSX.Element {
-  const { virtualPath, url, rows } = dataset
+  const {url, rows } = dataset
 
   return (
     <article className="group w-full bg-white/80 shadow-card duration-200 dark:bg-slate-900/60">
