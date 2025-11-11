@@ -1,24 +1,11 @@
 #!/usr/bin/env node
 
-import {
-  copyFileSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs'
-import type { Dirent } from 'node:fs'
+import type {Dirent} from 'node:fs'
+import {mkdirSync, readdirSync, readFileSync, statSync, writeFileSync,} from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import {
-  parquetMetadata,
-  parquetSchema,
-  type SchemaTree,
-  type SchemaElement,
-} from 'hyparquet'
-import { Project } from 'ts-morph'
+import {parquetMetadata, parquetSchema, type SchemaElement, type SchemaTree,} from 'hyparquet'
+import {Project} from 'ts-morph'
 
 const TRANSCRIPTS_DIR = path.resolve(process.cwd(), 'transcripts')
 const DIRECTORY_PREFIX = 'eval--'
@@ -44,7 +31,6 @@ function run(): void {
   }
 
   const { filePath, schema } = loadFirstSchema(parquetFiles)
-  const mirroredFiles = mirrorParquetFiles(parquetFiles)
   const interfaceName = inferInterfaceName(PARQUET_FILENAME)
   const generatedType = generateTypeScriptSource({
     interfaceName,
@@ -82,14 +68,6 @@ function run(): void {
       `  ${columnNames.join(', ')}`,
     ].join('\n')
   )
-  if (mirroredFiles.length) {
-    console.log(
-      [
-        `Copied ${mirroredFiles.length} parquet file${mirroredFiles.length === 1 ? '' : 's'} into web/src/parquet for Vite consumption.`,
-        `  ${mirroredFiles.map(file => path.relative(process.cwd(), file)).join('\n  ')}`,
-      ].join('\n')
-    )
-  }
 }
 
 function findParquetFiles(): string[] {
@@ -138,21 +116,6 @@ function loadFirstSchema(parquetFiles: string[]): {
   const metadata = parquetMetadata(arrayBuffer)
   const schema = parquetSchema(metadata)
   return { filePath, schema }
-}
-
-function mirrorParquetFiles(parquetFiles: string[]): string[] {
-  rmSync(WEB_PARQUET_DIR, { recursive: true, force: true })
-  mkdirSync(WEB_PARQUET_DIR, { recursive: true })
-
-  const copiedPaths: string[] = []
-  for (const filePath of parquetFiles) {
-    const relativePath = path.relative(TRANSCRIPTS_DIR, filePath)
-    const destination = path.join(WEB_PARQUET_DIR, relativePath)
-    mkdirSync(path.dirname(destination), { recursive: true })
-    copyFileSync(filePath, destination)
-    copiedPaths.push(destination)
-  }
-  return copiedPaths
 }
 
 function inferInterfaceName(filename: string): string {
