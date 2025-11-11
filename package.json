@@ -16,7 +16,7 @@
   "main": "index.js",
   "scripts": {
     "format": "pprettier --write \"transcripts/**/*.json\"",
-    "generate-parquet-schema": "tsx scripts/generate-parquet-schema.mts",
+    "generate-parquet-schema": "tsx scripts/generate-parquet-schema.mts web/src/fullDebateAnalysis.generated.ts",
     "clean-web-parquet": "rm -rf web/src/parquet"
   },
   "devDependencies": {
