@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { JSX } from 'react'
 import {
   createColumnHelper,
@@ -150,9 +150,20 @@ export function ConfigurationTable({
 }): JSX.Element {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [hideLojbanTasks, setHideLojbanTasks] = useState(true)
+
+  const filteredRows = useMemo(() => {
+    if (!hideLojbanTasks) {
+      return rows
+    }
+    return rows.filter((row) => {
+      const taskType = row.configuration?.task_type?.trim().toLowerCase()
+      return taskType !== 'lojban'
+    })
+  }, [hideLojbanTasks, rows])
 
   const table = useReactTable({
-    data: rows,
+    data: filteredRows,
     columns: tableColumns,
     state: {
       sorting,
@@ -166,6 +177,7 @@ export function ConfigurationTable({
     globalFilterFn: 'includesString',
   })
 
+
   const tableRows = table.getRowModel().rows
   const currentFilter =
     typeof table.getState().globalFilter === 'string' ? table.getState().globalFilter : ''
@@ -174,6 +186,18 @@ export function ConfigurationTable({
     <div className="mt-3">
       <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold uppercase text-slate-600 dark:text-slate-200">
         <span>Filter</span>
+        <button
+          type="button"
+          onClick={() => setHideLojbanTasks((current) => !current)}
+          aria-pressed={hideLojbanTasks}
+          className={`rounded-md border px-2 py-1 text-[11px] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+            hideLojbanTasks
+              ? 'border-indigo-500 bg-indigo-500 text-white hover:bg-indigo-600 dark:border-indigo-400 dark:bg-indigo-400 dark:hover:bg-indigo-300'
+              : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800'
+          }`}
+        >
+          {hideLojbanTasks ? 'Show Lobjan Tasks' : 'Hide Lojban Tasks'}
+        </button>
         <input
           value={currentFilter}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
