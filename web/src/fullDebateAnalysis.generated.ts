@@ -29,6 +29,19 @@ export interface FullDebateAnalysisRow {
     debater_a_probs: number[];
     debater_b_probs: number[];
   };
+  configuration: {
+    config_type: string;
+    task_type: string;
+    debater_name: string;
+    debater_training_round: string;
+    debater_is_reasoning: boolean;
+    debater_model_type: string;
+    debater_max_new_tokens: bigint;
+    judge_name: string;
+    judge_training_round: string;
+    judge_model_type: string;
+    judge_max_new_tokens: bigint;
+  };
 }
 
 export type FullDebateAnalysisRowFetchOptions = Omit<Parameters<typeof asyncBufferFromUrl>[0], 'url'>;
