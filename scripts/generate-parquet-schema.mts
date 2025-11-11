@@ -1,16 +1,13 @@
 #!/usr/bin/env node
 
-import type {Dirent} from 'node:fs'
-import {mkdirSync, readdirSync, readFileSync, statSync, writeFileSync,} from 'node:fs'
+import {existsSync, mkdirSync, readFileSync, statSync, writeFileSync,} from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import {parquetMetadata, parquetSchema, type SchemaElement, type SchemaTree,} from 'hyparquet'
 import {Project} from 'ts-morph'
 
-const TRANSCRIPTS_DIR = path.resolve(process.cwd(), 'transcripts')
-const DIRECTORY_PREFIX = 'eval--'
 const PARQUET_FILENAME = 'full_debate_analysis.parquet'
-const WEB_PARQUET_DIR = path.resolve(process.cwd(), 'web', 'src', 'parquet')
+const PARQUET_SOURCE = path.resolve(process.cwd(), 'web', 'src', 'parquet', PARQUET_FILENAME)
 
 function main(): void {
   try {
@@ -22,15 +19,13 @@ function main(): void {
 }
 
 function run(): void {
-  const parquetFiles = findParquetFiles()
-  if (!parquetFiles.length) {
-    console.warn(
-      `No parquet files found. Expected ${PARQUET_FILENAME} inside directories starting with "${DIRECTORY_PREFIX}" under ${TRANSCRIPTS_DIR}`
-    )
+  const parquetPath = resolveParquetPath()
+  if (!parquetPath) {
+    console.warn(`Parquet file not found at ${PARQUET_SOURCE}`)
     return
   }
 
-  const { filePath, schema } = loadFirstSchema(parquetFiles)
+  const { filePath, schema } = loadSchema(parquetPath)
   const interfaceName = inferInterfaceName(PARQUET_FILENAME)
   const generatedType = generateTypeScriptSource({
     interfaceName,
@@ -48,19 +43,6 @@ function run(): void {
     process.stdout.write(generatedType)
   }
 
-  if (parquetFiles.length > 1) {
-    const remaining = parquetFiles
-      .slice(1)
-      .map(p => path.relative(process.cwd(), p))
-      .join('\n  ')
-    console.warn(
-      [
-        'Additional parquet files detected. Consider verifying that they share a compatible schema:',
-        `  ${remaining}`,
-      ].join('\n')
-    )
-  }
-
   const columnNames = schema.children.map(child => child.element.name)
   console.log(
     [
@@ -70,44 +52,23 @@ function run(): void {
   )
 }
 
-function findParquetFiles(): string[] {
-  let dirEntries: Dirent[]
-  try {
-    dirEntries = readdirSync(TRANSCRIPTS_DIR, { withFileTypes: true })
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      return []
-    }
-    throw error
+function resolveParquetPath(): string | null {
+  if (!existsSync(PARQUET_SOURCE)) {
+    return null
   }
-
-  const candidates: string[] = []
-  for (const entry of dirEntries) {
-    if (!entry.isDirectory()) continue
-    if (!entry.name.startsWith(DIRECTORY_PREFIX)) continue
-    const candidatePath = path.join(
-      TRANSCRIPTS_DIR,
-      entry.name,
-      PARQUET_FILENAME
-    )
-    try {
-      const stats = statSync(candidatePath)
-      if (stats.isFile()) {
-        candidates.push(candidatePath)
-      }
-    } catch {
-      // Ignore missing files
-    }
+  const stats = statSync(PARQUET_SOURCE)
+  if (!stats.isFile()) {
+    console.warn(`Expected a file at ${PARQUET_SOURCE}, but found something else.`)
+    return null
   }
-
-  return candidates.sort((a, b) => a.localeCompare(b))
+  return PARQUET_SOURCE
 }
 
-function loadFirstSchema(parquetFiles: string[]): {
+function loadSchema(parquetPath: string): {
   filePath: string
   schema: SchemaTree
 } {
-  const filePath = parquetFiles[0]
+  const filePath = parquetPath
   const buffer = readFileSync(filePath)
   const arrayBuffer = buffer.buffer.slice(
     buffer.byteOffset,
