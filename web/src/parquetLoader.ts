@@ -12,9 +12,10 @@ export interface DebateDataset {
 }
 
 export async function loadAllDebateDatasets(): Promise<DebateDataset[]> {
-  const entries = Object.entries(parquetModules) as Array<[string, string]>
+  const entries = Object.entries(parquetModules)
   return Promise.all(
-    entries.map(async ([virtualPath, url]) => {
+    entries.map(async ([virtualPath, module]) => {
+      const url = resolveAssetUrl(module, virtualPath)
       const rows = await fetchFullDebateAnalysisRows(url)
       return { virtualPath, url, rows }
     })
@@ -43,4 +44,17 @@ function serializeValue(value: unknown): unknown {
     return Object.fromEntries(entries.map(([k, v]) => [k, serializeValue(v)]))
   }
   return value
+}
+
+function resolveAssetUrl(module: unknown, virtualPath: string): string {
+  if (typeof module === 'string') {
+    return module
+  }
+  if (module && typeof module === 'object' && 'default' in module) {
+    const candidate = (module as { default: unknown }).default
+    if (typeof candidate === 'string') {
+      return candidate
+    }
+  }
+  throw new TypeError(`Parquet asset at ${virtualPath} did not export a URL string`)
 }
