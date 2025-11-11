@@ -1,113 +1,27 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1b1f3b, #2d3047);
-  color: #f5f7fa;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-#app {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 3rem 2rem 4rem;
-}
-
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  text-align: left;
-}
-
-.dataset-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
-}
-
-.dataset {
-  background: rgba(20, 24, 45, 0.9);
-  border: 1px solid rgba(100, 108, 255, 0.25);
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
-}
-
-.dataset h2 {
-  margin: 0 0 0.35rem;
-  font-size: 1.1rem;
-  line-height: 1.4;
-  color: #a5b4fc;
-  word-break: break-all;
-}
-
-.dataset-meta {
-  margin: 0 0 1rem;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
-  word-break: break-all;
-}
-
-.dataset-snippet {
-  margin: 0;
-  padding: 1rem;
-  background: rgba(10, 12, 26, 0.85);
-  border-radius: 8px;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Monaco, monospace;
-  font-size: 0.8rem;
-  max-height: 320px;
-  overflow: auto;
-}
-
-@media (prefers-color-scheme: light) {
+@layer base {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color-scheme: light dark;
   }
+
   body {
-    background: linear-gradient(135deg, #e7ebff, #f5f7ff);
-    color: #1d1e32;
+    @apply min-h-screen bg-gradient-to-br from-indigo-50 via-white to-slate-100 text-slate-900 font-sans antialiased;
   }
-  .dataset {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(84, 90, 255, 0.2);
+
+  #app {
+    @apply mx-auto max-w-5xl px-6 py-12 md:px-12;
   }
-  .dataset h2 {
-    color: #4c51bf;
+
+  pre {
+    @apply font-mono;
   }
-  .dataset-meta {
-    color: rgba(33, 37, 71, 0.7);
-  }
-  .dataset-snippet {
-    background: rgba(242, 244, 255, 0.95);
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      @apply bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100;
+    }
   }
 }

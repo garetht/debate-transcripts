@@ -8,6 +8,7 @@ export default defineConfig({
   base: './', // ensure assets resolve correctly when served from GitHub Pages
   assetsInclude: ['**/*.parquet'],
   server: {
+    host: '0.0.0.0',
     fs: {
       // Allow importing assets from the Vite project root and sibling transcripts directory.
       allow: [rootDir, transcriptsDir],

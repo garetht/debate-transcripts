@@ -15,7 +15,6 @@ if [ -n "$staged_json_files" ]; then
 fi
 
 echo "Regenerating parquet schema and mirroring parquet assets..."
-npm run --silent clean-web-parquet
 npm run generate-parquet-schema -- web/src/fullDebateAnalysis.generated.ts || exit 1
 git add web/src/fullDebateAnalysis.generated.ts web/src/parquet
 
