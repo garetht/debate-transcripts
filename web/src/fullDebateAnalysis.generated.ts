@@ -28,6 +28,8 @@ export interface FullDebateAnalysisRow {
     first_debater_correct: bigint;
     debater_a_probs: number[];
     debater_b_probs: number[];
+    judge_accuracy: number;
+    judge_standard_error: number;
   };
   configuration: {
     raw_name: string;

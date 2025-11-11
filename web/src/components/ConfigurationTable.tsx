@@ -11,7 +11,8 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import type { FullDebateAnalysisRow } from '../fullDebateAnalysis.generated'
-import { formatJudgeAccuracy, getJudgeAccuracyValue } from '../utils/judgeAccuracy'
+import { formatJudgeAccuracy } from '../utils/judgeAccuracy'
+import {formatJudgeStandardError} from "../utils/judgeStandardError.ts";
 
 const columnHelper = createColumnHelper<FullDebateAnalysisRow>()
 
@@ -82,6 +83,23 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
       },
     }
   ),
+  columnHelper.accessor(
+      (row) => getJudgeAccuracyValue(row),
+      {
+        id: 'judgeStandardError',
+        header: () => 'Judge Standard Error',
+        cell: (info) => formatJudgeStandardError(info.row.original),
+        enableGlobalFilter: false,
+        sortingFn: (a, b, columnId) => {
+          const valueA = a.getValue<number | null>(columnId)
+          const valueB = b.getValue<number | null>(columnId)
+          if (valueA === null && valueB === null) return 0
+          if (valueA === null) return 1
+          if (valueB === null) return -1
+          return valueA - valueB
+        },
+      }
+  )
 ]
 
 const headerClassName = 'px-4 py-3'

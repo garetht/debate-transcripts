@@ -2,6 +2,7 @@ import type { JSX } from 'react'
 import type { DebateDataset } from '../parquetLoader'
 import type { FullDebateAnalysisRow } from '../fullDebateAnalysis.generated'
 import { formatJudgeAccuracy } from '../utils/judgeAccuracy'
+import {formatJudgeStandardError} from "../utils/judgeStandardError.ts";
 
 export function DetailScreen({
   dataset,
@@ -39,6 +40,10 @@ export function DetailScreen({
     {
       label: 'Judge Accuracy',
       value: formatJudgeAccuracy(row),
+    },
+    {
+      label: 'Judge Standard Error',
+      value: formatJudgeStandardError(row),
     },
   ]
 
