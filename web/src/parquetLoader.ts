@@ -1,7 +1,8 @@
 import { fetchFullDebateAnalysisRows, type FullDebateAnalysisRow } from './fullDebateAnalysis.generated'
 
-const PARQUET_VIRTUAL_PATH = './parquet/full_debate_analysis.parquet'
-const PARQUET_URL = new URL(PARQUET_VIRTUAL_PATH, import.meta.url).href
+const PARQUET_SOURCE_PATH = './parquet/full_debate_analysis.parquet'
+const PARQUET_ASSET = new URL('./parquet/full_debate_analysis.parquet', import.meta.url)
+const PARQUET_URL = PARQUET_ASSET.href
 
 export interface DebateDataset {
   virtualPath: string
@@ -11,7 +12,7 @@ export interface DebateDataset {
 
 export async function loadAllDebateDatasets(): Promise<DebateDataset[]> {
   const rows = await fetchFullDebateAnalysisRows(PARQUET_URL)
-  return [{ virtualPath: PARQUET_VIRTUAL_PATH, url: PARQUET_URL, rows }]
+  return [{ virtualPath: PARQUET_SOURCE_PATH, url: PARQUET_URL, rows }]
 }
 
 export function previewRow(row: FullDebateAnalysisRow, maxKeys = 4): Record<string, unknown> {
