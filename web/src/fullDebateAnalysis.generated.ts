@@ -53,21 +53,16 @@ export interface FullDebateAnalysisRowFetchOptions {
 }
 
 export async function fetchFullDebateAnalysisRows(url: string, options?: FullDebateAnalysisRowFetchOptions): Promise<FullDebateAnalysisRow[]> {
-  const logPrefix = '[fetchFullDebateAnalysisRows]';
   const fetchImpl = options?.fetch ?? globalThis.fetch;
   if (!fetchImpl) {
     throw new Error('fetch is not available in this environment');
   }
   const requestInit = options?.requestInit;
-  console.info(logPrefix, 'downloading full parquet file to avoid truncated range responses', { url });
   const response = await fetchImpl(url, requestInit);
   if (!response.ok) {
-    console.error(logPrefix, 'full download failed', { url, status: response.status });
     throw new Error(`parquet fetch failed ${response.status}`);
   }
   const buffer = await response.arrayBuffer();
-  console.debug(logPrefix, 'download complete', { url, status: response.status, byteLength: buffer.byteLength });
-  console.info(logPrefix, 'GitHub Pages only serves ~48KB for range requests; parsing from the full buffer instead.');
   const file = {
     byteLength: buffer.byteLength,
     async slice(start: number, end?: number) {
@@ -79,10 +74,8 @@ export async function fetchFullDebateAnalysisRows(url: string, options?: FullDeb
       file,
       rowFormat: 'object',
     } as Parameters<typeof parquetReadObjects>[0]);
-    console.info(logPrefix, 'loaded parquet', { url, rowCount: rows.length });
     return rows as FullDebateAnalysisRow[];
   } catch (error) {
-    console.error(logPrefix, 'parquet parsing failed even after full download', { url, error });
     throw error;
   }
 }
