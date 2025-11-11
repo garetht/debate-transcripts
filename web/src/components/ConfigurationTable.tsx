@@ -40,7 +40,7 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
     (row) => row.configuration?.debater_training_round?.trim() ?? '',
     {
       id: 'debaterTrainingRound',
-      header: () => 'Debater Training Round',
+      header: () => 'Debater Training',
       cell: (info) => info.getValue() || '—',
       filterFn: 'includesString',
       sortingFn: 'alphanumeric',
@@ -60,14 +60,14 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
     (row) => row.configuration?.judge_training_round?.trim() ?? '',
     {
       id: 'judgeTrainingRound',
-      header: () => 'Judge Training Round',
+      header: () => 'Judge Training',
       cell: (info) => info.getValue() || '—',
       filterFn: 'includesString',
       sortingFn: 'alphanumeric',
     }
   ),
   columnHelper.accessor(
-    (row) => getJudgeAccuracyValue(row),
+    (row) => row.stats.judge_accuracy,
     {
       id: 'judgeAccuracy',
       header: () => 'Judge Accuracy',
@@ -84,10 +84,10 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
     }
   ),
   columnHelper.accessor(
-      (row) => getJudgeAccuracyValue(row),
+      (row) => row.stats.judge_standard_error,
       {
         id: 'judgeStandardError',
-        header: () => 'Judge Standard Error',
+        header: () => 'Judge Stderr',
         cell: (info) => formatJudgeStandardError(info.row.original),
         enableGlobalFilter: false,
         sortingFn: (a, b, columnId) => {
@@ -99,18 +99,46 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
           return valueA - valueB
         },
       }
-  )
+  ),
+  columnHelper.accessor(
+    (row) => row.configuration?.raw_name?.trim() ?? '',
+    {
+      id: 'github',
+      header: () => 'Github',
+      cell: (info) => {
+        const rawName = info.getValue<string>()
+        if (!rawName) {
+          return '—'
+        }
+        const url = `https://github.com/garetht/debate-transcripts/tree/main/transcripts/${rawName}/outputs`
+        return (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-600 hover:underline"
+            onClick={(event) => event.stopPropagation()}
+          >
+            Link
+          </a>
+        )
+      },
+      enableGlobalFilter: false,
+    }
+  ),
 ]
 
-const headerClassName = 'px-4 py-3'
-const defaultCellClassName = 'px-4 py-3 text-sm text-slate-700 dark:text-slate-200'
+const headerClassName = 'px-3 py-2'
+const defaultCellClassName = 'px-3 py-2 text-sm text-slate-700 dark:text-slate-200'
 const cellClassNameMap: Record<string, string> = {
   taskType: defaultCellClassName,
   debater: defaultCellClassName,
-  debaterTrainingRound: 'px-4 py-3 text-xs text-slate-600 dark:text-slate-300',
+  debaterTrainingRound: 'px-2.5 py-2 text-xs text-slate-600 dark:text-slate-300',
   judge: defaultCellClassName,
-  judgeTrainingRound: 'px-4 py-3 text-xs text-slate-600 dark:text-slate-300',
-  judgeAccuracy: 'px-4 py-3 text-xs font-medium text-slate-500 dark:text-slate-300',
+  judgeTrainingRound: 'px-2.5 py-2 text-xs text-slate-600 dark:text-slate-300',
+  judgeAccuracy: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
+  judgeStandardError: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
+  github: defaultCellClassName,
 }
 
 export function ConfigurationTable({
@@ -143,20 +171,20 @@ export function ConfigurationTable({
     typeof table.getState().globalFilter === 'string' ? table.getState().globalFilter : ''
 
   return (
-    <div className="mt-4 rounded-xl border border-slate-200/60 bg-white/70 shadow-inner transition-colors dark:border-slate-700/60 dark:bg-slate-950/40">
-      <div className="flex items-center gap-2 border-b border-slate-200/60 bg-slate-100/80 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-200">
+    <div className="mt-3">
+      <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold uppercase text-slate-600 dark:text-slate-200">
         <span>Filter</span>
         <input
           value={currentFilter}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
           placeholder="Search configuration…"
           aria-label="Filter configuration rows"
-          className="w-full max-w-xs rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-normal text-slate-700 shadow-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-indigo-300 dark:focus:ring-indigo-500/40"
+          className="w-full max-w-xs rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm font-normal text-slate-700 shadow-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-indigo-300 dark:focus:ring-indigo-500/40"
         />
       </div>
       {tableRows.length > 0 ? (
         <table className="min-w-full table-auto divide-y divide-slate-200 dark:divide-slate-800">
-          <thead className="bg-slate-100/80 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-800/60 dark:text-slate-200">
+          <thead className="bg-slate-100/80 text-left text-xs font-semibold uppercase text-slate-600 dark:bg-slate-800/60 dark:text-slate-200">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -167,7 +195,7 @@ export function ConfigurationTable({
                         onClick={header.column.getToggleSortingHandler()}
                         className="flex items-center gap-1 text-left text-slate-600 transition-colors hover:text-indigo-600 focus:outline-none focus-visible:text-indigo-600 dark:text-slate-200 dark:hover:text-indigo-200 dark:focus-visible:text-indigo-200"
                       >
-                        <span className="uppercase tracking-wide">
+                        <span className="uppercase">
                           {flexRender(header.column.columnDef.header, header.getContext())}
                         </span>
                         <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
@@ -179,7 +207,7 @@ export function ConfigurationTable({
                         </span>
                       </button>
                     ) : (
-                      <span className="uppercase tracking-wide">
+                      <span className="uppercase">
                         {flexRender(header.column.columnDef.header, header.getContext())}
                       </span>
                     )}
