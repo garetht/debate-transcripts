@@ -222,30 +222,31 @@ function generateTypeScriptSource({
     }
   }
 
-  sourceFile.addTypeAlias({
-    name: `${interfaceName}FetchOptions`,
-    isExported: true,
-    type: "Omit<Parameters<typeof asyncBufferFromUrl>[0], 'url'>",
-  })
-
   sourceFile.addStatements(writer => {
     writer.blankLine()
-  })
-
-  sourceFile.addFunction({
-    isExported: true,
-    name: `fetch${interfaceName}s`,
-    isAsync: true,
-    returnType: `Promise<${interfaceName}[]>`,
-    parameters: [
-      { name: 'url', type: 'string' },
-      { name: 'options', hasQuestionToken: true, type: `${interfaceName}FetchOptions` },
-    ],
-    statements: [
-      'const file = await asyncBufferFromUrl({ url, ...(options ?? {}) });',
-      "const rows = await parquetReadObjects({ file, rowFormat: 'object' });",
-      `return rows as ${interfaceName}[];`,
-    ],
+    writer.writeLine(`type ${interfaceName}BufferOptions = Omit<Parameters<typeof asyncBufferFromUrl>[0], 'url'>;`)
+    writer.blankLine()
+    writer.writeLine(`export interface ${interfaceName}FetchOptions extends ${interfaceName}BufferOptions {`)
+    writer.writeLine(`  /**`)
+    writer.writeLine(`   * Maximum bytes to request from the tail of the file when reading metadata.`)
+    writer.writeLine(`   * Hosting providers like GitHub Pages can cap range responses; keeping this low prevents truncated footers.`)
+    writer.writeLine(`   */`)
+    writer.writeLine(`  metadataInitialFetchSize?: number;`)
+    writer.writeLine(`}`)
+    writer.blankLine()
+    writer.writeLine(`const DEFAULT_METADATA_INITIAL_FETCH_SIZE = 32 * 1024;`)
+    writer.blankLine()
+    writer.writeLine(`export async function fetch${interfaceName}s(url: string, options?: ${interfaceName}FetchOptions): Promise<${interfaceName}[]> {`)
+    writer.writeLine(`  const { metadataInitialFetchSize, ...asyncBufferOptions } = options ?? {};`)
+    writer.writeLine(`  const file = await asyncBufferFromUrl({ url, ...(asyncBufferOptions as ${interfaceName}BufferOptions) });`)
+    writer.writeLine(`  const initialFetchSize = Math.max(8, Math.min(metadataInitialFetchSize ?? DEFAULT_METADATA_INITIAL_FETCH_SIZE, file.byteLength));`)
+    writer.writeLine(`  const rows = await parquetReadObjects({`)
+    writer.writeLine(`    file,`)
+    writer.writeLine(`    rowFormat: 'object',`)
+    writer.writeLine(`    initialFetchSize,`)
+    writer.writeLine(`  } as Parameters<typeof parquetReadObjects>[0]);`)
+    writer.writeLine(`  return rows as ${interfaceName}[];`)
+    writer.writeLine(`}`)
   })
 
   sourceFile.formatText({

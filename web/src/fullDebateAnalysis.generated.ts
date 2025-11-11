@@ -44,10 +44,28 @@ export interface FullDebateAnalysisRow {
   };
 }
 
-export type FullDebateAnalysisRowFetchOptions = Omit<Parameters<typeof asyncBufferFromUrl>[0], 'url'>;
+
+type FullDebateAnalysisRowBufferOptions = Omit<Parameters<typeof asyncBufferFromUrl>[0], 'url'>;
+
+export interface FullDebateAnalysisRowFetchOptions extends FullDebateAnalysisRowBufferOptions {
+  /**
+   * Maximum bytes to request from the tail of the file when reading metadata.
+   * Hosting providers like GitHub Pages can cap range responses; keeping this low prevents truncated footers.
+   */
+  metadataInitialFetchSize?: number;
+}
+
+const DEFAULT_METADATA_INITIAL_FETCH_SIZE = 32 * 1024;
 
 export async function fetchFullDebateAnalysisRows(url: string, options?: FullDebateAnalysisRowFetchOptions): Promise<FullDebateAnalysisRow[]> {
-  const file = await asyncBufferFromUrl({ url, ...(options ?? {}) });
-  const rows = await parquetReadObjects({ file, rowFormat: 'object' });
+  const { metadataInitialFetchSize, ...asyncBufferOptions } = options ?? {};
+  const file = await asyncBufferFromUrl({ url, ...(asyncBufferOptions as FullDebateAnalysisRowBufferOptions) });
+  const initialFetchSize = Math.max(8, Math.min(metadataInitialFetchSize ?? DEFAULT_METADATA_INITIAL_FETCH_SIZE, file.byteLength));
+  const rows = await parquetReadObjects({
+    file,
+    rowFormat: 'object',
+    initialFetchSize,
+  } as Parameters<typeof parquetReadObjects>[0]);
   return rows as FullDebateAnalysisRow[];
 }
+
