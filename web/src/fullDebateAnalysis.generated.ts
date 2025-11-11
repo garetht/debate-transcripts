@@ -58,14 +58,44 @@ export interface FullDebateAnalysisRowFetchOptions extends FullDebateAnalysisRow
 const DEFAULT_METADATA_INITIAL_FETCH_SIZE = 32 * 1024;
 
 export async function fetchFullDebateAnalysisRows(url: string, options?: FullDebateAnalysisRowFetchOptions): Promise<FullDebateAnalysisRow[]> {
+  const logPrefix = '[fetchFullDebateAnalysisRows]';
   const { metadataInitialFetchSize, ...asyncBufferOptions } = options ?? {};
+  console.info(logPrefix, 'requesting parquet', { url, requestedInitialFetchSize: metadataInitialFetchSize ?? DEFAULT_METADATA_INITIAL_FETCH_SIZE });
   const file = await asyncBufferFromUrl({ url, ...(asyncBufferOptions as FullDebateAnalysisRowBufferOptions) });
   const initialFetchSize = Math.max(8, Math.min(metadataInitialFetchSize ?? DEFAULT_METADATA_INITIAL_FETCH_SIZE, file.byteLength));
-  const rows = await parquetReadObjects({
-    file,
-    rowFormat: 'object',
-    initialFetchSize,
-  } as Parameters<typeof parquetReadObjects>[0]);
-  return rows as FullDebateAnalysisRow[];
+  console.debug(logPrefix, 'resolved async buffer', { url, byteLength: file.byteLength, initialFetchSize });
+  try {
+    const rows = await parquetReadObjects({
+      file,
+      rowFormat: 'object',
+      initialFetchSize,
+    } as Parameters<typeof parquetReadObjects>[0]);
+    console.info(logPrefix, 'loaded parquet', { url, rowCount: rows.length });
+    return rows as FullDebateAnalysisRow[];
+  } catch (error) {
+    console.error(logPrefix, 'streamed parquet read failed, retrying with full download', { url, error });
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`fallback fetch failed ${response.status}`);
+      }
+      const buffer = await response.arrayBuffer();
+      const fallbackFile = {
+        byteLength: buffer.byteLength,
+        async slice(start: number, end?: number) {
+          return buffer.slice(start, end);
+        },
+      };
+      const rows = await parquetReadObjects({
+        file: fallbackFile,
+        rowFormat: 'object',
+      } as Parameters<typeof parquetReadObjects>[0]);
+      console.info(logPrefix, 'loaded parquet via fallback', { url, rowCount: rows.length });
+      return rows as FullDebateAnalysisRow[];
+    } catch (fallbackError) {
+      console.error(logPrefix, 'fallback download failed', { url, error: fallbackError });
+      throw fallbackError;
+    }
+  }
 }
 
