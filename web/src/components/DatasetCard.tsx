@@ -10,13 +10,13 @@ export function DatasetCard({
   dataset: DebateDataset
   onSelectRow: (row: FullDebateAnalysisRow, dataset: DebateDataset) => void
 }): JSX.Element {
-  const {url, rows } = dataset
+  const { rows } = dataset
 
   return (
     <article className="group w-full bg-white/80 shadow-card duration-200 dark:bg-slate-900/60">
-      <p className="text-sm text-slate-600 transition-colors dark:text-slate-300">{`${rows.length} row${
+      <p className="text-sm text-slate-600 transition-colors dark:text-slate-300">{`${rows.length} evaluation${
         rows.length === 1 ? '' : 's'
-      } • ${url}`}</p>
+      }.`}</p>
       {rows.length > 0 ? (
         <ConfigurationTable rows={rows} onSelectRow={(row) => onSelectRow(row, dataset)} />
       ) : (
