@@ -23,5 +23,13 @@
     body {
       @apply bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100;
     }
+
+    .plot-d6a7b5 {
+      --plot-background: black;
+    }
+  }
+
+  .plot-d6a7b5 {
+    --plot-background: black;
   }
 }

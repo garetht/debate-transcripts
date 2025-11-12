@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {useState} from 'react'
 import type { JSX } from 'react'
 import { DatasetCard } from './components/DatasetCard'
 import { PlaceholderCard } from './components/PlaceholderCard'
@@ -6,6 +6,7 @@ import { useDebateDatasets } from './hooks/useDebateDatasets'
 import type { DebateDataset } from './parquetLoader'
 import type { FullDebateAnalysisRow } from './fullDebateAnalysis.generated'
 import { DetailScreen } from './screens/DetailScreen'
+import { AllEvaluationsGraphs } from './components/AllEvaluationsGraphs.tsx'
 
 export function App(): JSX.Element {
   const { datasets, state } = useDebateDatasets()
@@ -30,7 +31,7 @@ export function App(): JSX.Element {
         <>
           <header className="space-y-2">
             <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-              Parquet Schema Preview
+              Debater Evaluation Results
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-300">{state.message}</p>
           </header>
@@ -51,6 +52,8 @@ export function App(): JSX.Element {
               <PlaceholderCard message="Unable to display datasets." tone="error" />
             )}
           </section>
+
+          <AllEvaluationsGraphs datasets={datasets} />
         </>
       )}
     </main>
