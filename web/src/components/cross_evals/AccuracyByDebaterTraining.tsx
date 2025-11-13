@@ -128,14 +128,6 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
                 ]
               : []
           ),
-          Plot.ruleY(pointsWithError, {
-            x: (d: PointWithError) => d.configuration.debater_training_round,
-            y1: (d: PointWithError) => d.lower,
-            y2: (d: PointWithError) => d.upper,
-            stroke: (d: PointWithError) => d.configuration.debater_model_type,
-            strokeWidth: 1.5,
-            strokeOpacity: 0.6,
-          }),
           Plot.dot(pointsWithError, {
             x: (d: PointWithError) => d.configuration.debater_training_round,
             y: (d: PointWithError) => d.accuracy,
