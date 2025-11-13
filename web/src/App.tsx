@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useMemo, useState} from 'react'
 import type { JSX } from 'react'
 import { DatasetCard } from './components/DatasetCard'
 import { PlaceholderCard } from './components/PlaceholderCard'
@@ -6,7 +6,7 @@ import { useDebateDatasets } from './hooks/useDebateDatasets'
 import type { DebateDataset } from './parquetLoader'
 import type { FullDebateAnalysisRow } from './fullDebateAnalysis.generated'
 import { DetailScreen } from './screens/DetailScreen'
-import { AllEvaluationsGraphs } from './components/AllEvaluationsGraphs.tsx'
+import { AllEvaluationsGraphs } from './components/cross_evals/AllEvaluationsGraphs.tsx'
 
 export function App(): JSX.Element {
   const { datasets, state } = useDebateDatasets()
@@ -14,6 +14,9 @@ export function App(): JSX.Element {
     dataset: DebateDataset
     row: FullDebateAnalysisRow
   } | null>(null)
+  const [filteredRowsByDataset, setFilteredRowsByDataset] = useState<
+    Record<string, FullDebateAnalysisRow[]>
+  >({})
 
   const handleSelectRow = (row: FullDebateAnalysisRow, dataset: DebateDataset) => {
     setSelected({ dataset, row })
@@ -22,6 +25,42 @@ export function App(): JSX.Element {
   const handleBack = () => {
     setSelected(null)
   }
+
+  const handleFilteredRowsChange = (dataset: DebateDataset, rows: FullDebateAnalysisRow[]) => {
+    setFilteredRowsByDataset((previous) => {
+      const existing = previous[dataset.virtualPath]
+      const hasSameRows =
+        existing !== undefined &&
+        existing.length === rows.length &&
+        existing.every((row, index) => row === rows[index])
+
+      if (hasSameRows) {
+        return previous
+      }
+
+      return {
+        ...previous,
+        [dataset.virtualPath]: rows,
+      }
+    })
+  }
+
+  const datasetsForGraphs = useMemo(() => {
+    if (!datasets || datasets.length === 0) {
+      return datasets
+    }
+
+    return datasets.map((dataset) => {
+      const filteredRows = filteredRowsByDataset[dataset.virtualPath]
+      if (!filteredRows) {
+        return dataset
+      }
+      return {
+        ...dataset,
+        rows: filteredRows,
+      }
+    })
+  }, [datasets, filteredRowsByDataset])
 
   return (
     <main className="flex flex-col gap-6 text-left">
@@ -42,6 +81,9 @@ export function App(): JSX.Element {
                   key={dataset.virtualPath}
                   dataset={dataset}
                   onSelectRow={handleSelectRow}
+                  onFilteredRowsChange={(rows, currentDataset) =>
+                    handleFilteredRowsChange(currentDataset, rows)
+                  }
                 />
               ))
             ) : state.status === 'loading' ? (
@@ -53,7 +95,7 @@ export function App(): JSX.Element {
             )}
           </section>
 
-          <AllEvaluationsGraphs datasets={datasets} />
+          <AllEvaluationsGraphs datasets={datasetsForGraphs} />
         </>
       )}
     </main>

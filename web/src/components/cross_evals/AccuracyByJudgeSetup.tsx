@@ -1,35 +1,21 @@
-import {useEffect, useRef} from 'react'
+import {useCallback} from 'react'
 import type {JSX} from 'react'
 import * as Plot from '@observablehq/plot'
-import type {Plot as PlotT} from '@observablehq/plot'
-import type {DebateDataset} from '../parquetLoader'
-import type {FullDebateAnalysisRow as DataT} from '../fullDebateAnalysis.generated.ts'
+import type {DebateDataset} from '../../parquetLoader'
+import type {FullDebateAnalysisRow as DataT} from '../../fullDebateAnalysis.generated.ts'
+import {ResponsivePlot, type PlotRenderer} from '../ResponsivePlot'
 
 export interface AccuracyByJudgeSetupProps {
   datasets?: DebateDataset[]
 }
 
 export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX.Element {
-  const containerRef = useRef<HTMLDivElement | null>(null)
+  const render = useCallback<PlotRenderer>(
+    (width) => {
+      if (!datasets || datasets.length === 0) return null
 
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    let currentPlot: ((SVGSVGElement & PlotT) | (HTMLElement & PlotT)) | null = null
-
-    const renderPlot = () => {
-      if (!container) return
-      if (!datasets || datasets.length === 0) {
-        container.replaceChildren()
-        return
-      }
-
-      const points = datasets.flatMap((dataset) => dataset.rows.map((row) => row))
-      if (points.length === 0) {
-        container.replaceChildren()
-        return
-      }
+      const points = datasets.flatMap((dataset) => dataset.rows)
+      if (points.length === 0) return null
 
       const data = points.map((row: DataT) => {
         const totalDebates = Number(row.stats.total_debates ?? 0n)
@@ -56,11 +42,10 @@ export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX
       const xDomain = Array.from(new Set(data.map((d) => d.label))).sort((a, b) =>
         a.localeCompare(b),
       )
-      const width = Math.max(container.clientWidth, 640)
 
-      const plot = Plot.plot({
+      return {
         height: 400,
-        width,
+        width: Math.max(width, 640),
         inset: 12,
         marginBottom: 120,
         style: {fontSize: '14px'},
@@ -119,21 +104,10 @@ export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX
             },
           }),
         ],
-      })
+      }
+    },
+    [datasets],
+  )
 
-      container.replaceChildren(plot)
-      currentPlot = plot
-    }
-
-    renderPlot()
-    const resizeObserver = new ResizeObserver(() => renderPlot())
-    resizeObserver.observe(container)
-
-    return () => {
-      resizeObserver.disconnect()
-      currentPlot?.remove()
-    }
-  }, [datasets])
-
-  return <div ref={containerRef} className="w-full" />
+  return <ResponsivePlot render={render} className="w-full" />
 }

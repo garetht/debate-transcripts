@@ -2,8 +2,8 @@ import {useEffect, useRef} from 'react'
 import type {JSX} from 'react'
 import * as Plot from '@observablehq/plot'
 import type {Plot as PlotT} from '@observablehq/plot'
-import type {DebateDataset} from '../parquetLoader'
-import type {FullDebateAnalysisRow as DataT} from '../fullDebateAnalysis.generated.ts'
+import type {DebateDataset} from '../../parquetLoader'
+import type {FullDebateAnalysisRow as DataT} from '../../fullDebateAnalysis.generated.ts'
 
 export interface DebaterWinRateByModelProps {
   datasets?: DebateDataset[]

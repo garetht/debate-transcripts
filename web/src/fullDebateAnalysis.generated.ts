@@ -36,10 +36,12 @@ export interface FullDebateAnalysisRow {
     config_type: string;
     task_type: string;
     debater_name: string;
+    debater_base_model: string;
     debater_training_round: string;
     debater_is_reasoning: boolean;
     debater_model_type: string;
     debater_max_new_tokens: bigint;
+    judge_base_model: string;
     judge_name: string;
     judge_training_round: string;
     judge_model_type: string;

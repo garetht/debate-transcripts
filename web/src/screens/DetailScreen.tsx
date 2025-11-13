@@ -3,6 +3,7 @@ import type { DebateDataset } from '../parquetLoader'
 import type { FullDebateAnalysisRow } from '../fullDebateAnalysis.generated'
 import { formatJudgeAccuracy } from '../utils/judgeAccuracy'
 import {formatJudgeStandardError} from "../utils/judgeStandardError.ts";
+import {SingleEvaluationGraph} from '../components/single_eval/SingleEvaluationGraph.tsx'
 
 export function DetailScreen({
   dataset,
@@ -81,6 +82,8 @@ export function DetailScreen({
           </div>
         ))}
       </div>
+
+      <SingleEvaluationGraph row={row} />
 
       <div className="space-y-4 rounded-2xl border border-indigo-200/60 bg-indigo-50/60 p-4 text-sm text-slate-700 shadow-inner dark:border-indigo-400/40 dark:bg-indigo-500/10 dark:text-slate-200">
         <h2 className="text-base font-semibold text-indigo-700 dark:text-indigo-200">

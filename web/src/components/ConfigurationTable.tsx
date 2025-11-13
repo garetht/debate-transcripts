@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { JSX } from 'react'
 import {
   createColumnHelper,
@@ -101,6 +101,29 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
       }
   ),
   columnHelper.accessor(
+      (row) => {
+        const count = row.distribution?.transcript_count
+        return count === undefined || count === null ? null : Number(count)
+      },
+      {
+        id: 'totalTranscripts',
+        header: () => '#',
+        cell: (info) => {
+          const value = info.getValue<number | null>()
+          return value == null ? '—' : value.toLocaleString()
+        },
+        enableGlobalFilter: false,
+        sortingFn: (a, b, columnId) => {
+          const valueA = a.getValue<number | null>(columnId)
+          const valueB = b.getValue<number | null>(columnId)
+          if (valueA === null && valueB === null) return 0
+          if (valueA === null) return 1
+          if (valueB === null) return -1
+          return valueA - valueB
+        },
+      }
+  ),
+  columnHelper.accessor(
     (row) => row.configuration?.raw_name?.trim() ?? '',
     {
       id: 'github',
@@ -136,6 +159,7 @@ const cellClassNameMap: Record<string, string> = {
   debaterTrainingRound: 'px-2.5 py-2 text-xs text-slate-600 dark:text-slate-300',
   judge: defaultCellClassName,
   judgeTrainingRound: 'px-2.5 py-2 text-xs text-slate-600 dark:text-slate-300',
+  totalTranscripts: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
   judgeAccuracy: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
   judgeStandardError: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
   github: defaultCellClassName,
@@ -144,9 +168,11 @@ const cellClassNameMap: Record<string, string> = {
 export function ConfigurationTable({
   rows,
   onSelectRow,
+  onFilteredRowsChange,
 }: {
   rows: FullDebateAnalysisRow[]
   onSelectRow: (row: FullDebateAnalysisRow) => void
+  onFilteredRowsChange?: (rows: FullDebateAnalysisRow[]) => void
 }): JSX.Element {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -179,6 +205,27 @@ export function ConfigurationTable({
 
 
   const tableRows = table.getRowModel().rows
+  const filteredRowOriginals = useMemo(
+    () => tableRows.map((row) => row.original),
+    [tableRows],
+  )
+  const lastReportedRows = useRef<FullDebateAnalysisRow[]>([])
+  useEffect(() => {
+    if (!onFilteredRowsChange) {
+      return
+    }
+
+    const hasSameRows =
+      lastReportedRows.current.length === filteredRowOriginals.length &&
+      lastReportedRows.current.every((row, index) => row === filteredRowOriginals[index])
+
+    if (hasSameRows) {
+      return
+    }
+
+    lastReportedRows.current = filteredRowOriginals
+    onFilteredRowsChange(filteredRowOriginals)
+  }, [filteredRowOriginals, onFilteredRowsChange])
   const currentFilter =
     typeof table.getState().globalFilter === 'string' ? table.getState().globalFilter : ''
 
