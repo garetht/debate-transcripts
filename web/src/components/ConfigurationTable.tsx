@@ -8,6 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
+  type FilterFn,
   type SortingState,
 } from '@tanstack/react-table'
 import type { FullDebateAnalysisRow } from '../fullDebateAnalysis.generated'
@@ -16,6 +17,24 @@ import {formatJudgeStandardError} from "../utils/judgeStandardError.ts";
 
 const columnHelper = createColumnHelper<FullDebateAnalysisRow>()
 
+const stringIncludesCaseInsensitive: FilterFn<FullDebateAnalysisRow> = (
+  row,
+  columnId,
+  filterValue,
+) => {
+  if (typeof filterValue !== 'string') return true
+  const normalizedFilter = filterValue.trim().toLowerCase()
+  if (normalizedFilter === '') return true
+
+  const rawValue = row.getValue<unknown>(columnId)
+  if (rawValue == null) return false
+
+  return String(rawValue).toLowerCase().includes(normalizedFilter)
+}
+
+stringIncludesCaseInsensitive.autoRemove = (value) =>
+  typeof value !== 'string' || value.trim() === ''
+
 const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
   columnHelper.accessor(
     (row) => row.configuration?.task_type?.trim() ?? '',
@@ -23,7 +42,7 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
       id: 'taskType',
       header: () => 'Task Type',
       cell: (info) => info.getValue() || '—',
-      filterFn: 'includesString',
+      filterFn: stringIncludesCaseInsensitive,
     }
   ),
   columnHelper.accessor(
@@ -32,7 +51,7 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
       id: 'debater',
       header: () => 'Debater Name',
       cell: (info) => info.getValue() || '—',
-      filterFn: 'includesString',
+      filterFn: stringIncludesCaseInsensitive,
       sortingFn: 'alphanumeric',
     }
   ),
@@ -42,7 +61,7 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
       id: 'debaterTrainingRound',
       header: () => 'Debater Training',
       cell: (info) => info.getValue() || '—',
-      filterFn: 'includesString',
+      filterFn: stringIncludesCaseInsensitive,
       sortingFn: 'alphanumeric',
     }
   ),
@@ -52,7 +71,7 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
       id: 'judge',
       header: () => 'Judge Name',
       cell: (info) => info.getValue() || '—',
-      filterFn: 'includesString',
+      filterFn: stringIncludesCaseInsensitive,
       sortingFn: 'alphanumeric',
     }
   ),
@@ -62,7 +81,7 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
       id: 'judgeTrainingRound',
       header: () => 'Judge Training',
       cell: (info) => info.getValue() || '—',
-      filterFn: 'includesString',
+      filterFn: stringIncludesCaseInsensitive,
       sortingFn: 'alphanumeric',
     }
   ),
@@ -224,7 +243,7 @@ export function ConfigurationTable({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    globalFilterFn: 'includesString',
+    globalFilterFn: stringIncludesCaseInsensitive,
   })
 
 

@@ -30,6 +30,42 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
       )
       const trainingDomain = [...TRAINING_DOMAIN, ...extras]
 
+      const connectionsMap = new Map<
+        string,
+        {
+          sft?: DataT
+          dpo?: DataT
+          debaterModelType?: DataT['configuration']['debater_model_type']
+        }
+      >()
+
+      for (const point of points) {
+        const {debater_training_round, debater_base_model, judge_base_model, judge_training_round, debater_model_type} =
+          point.configuration
+        if (debater_training_round !== 'SFT_ONLY' && debater_training_round !== 'ROUND_TWO_DPO') continue
+        const key = [debater_base_model, judge_base_model, judge_training_round].join('::')
+        const existing = connectionsMap.get(key) ?? {}
+        if (debater_training_round === 'SFT_ONLY') {
+          existing.sft = point
+        } else {
+          existing.dpo = point
+        }
+        if (!existing.debaterModelType) {
+          existing.debaterModelType = debater_model_type
+        }
+        connectionsMap.set(key, existing)
+      }
+
+      const connections = Array.from(connectionsMap.values())
+        .filter(({sft, dpo}) => sft && dpo)
+        .map(({sft, dpo, debaterModelType}) => ({
+          x1: 'SFT_ONLY',
+          y1: sft!.stats.judge_accuracy,
+          x2: 'ROUND_TWO_DPO',
+          y2: dpo!.stats.judge_accuracy,
+          debaterModelType: debaterModelType ?? sft!.configuration.debater_model_type,
+        }))
+
       return {
         height: 360,
         width: Math.max(width, 640),
@@ -56,11 +92,26 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
         marks: [
           Plot.text([null], {
             frameAnchor: 'top',
-            text: () => 'Judge accuracy by debater training round',
+            text: () => 'Judge accuracy by debater training',
             fontSize: 16,
             dy: -12,
           }),
           Plot.ruleY([0.45, 0.85], {strokeOpacity: 0.3}),
+          ...(
+            connections.length > 0
+              ? [
+                  Plot.link(connections, {
+                    x1: 'x1',
+                    y1: 'y1',
+                    x2: 'x2',
+                    y2: 'y2',
+                    stroke: 'debaterModelType',
+                    strokeWidth: 1.5,
+                    strokeOpacity: 0.6,
+                  }),
+                ]
+              : []
+          ),
           Plot.dot(points, {
             x: (d: DataT) => d.configuration.debater_training_round,
             y: (d: DataT) => d.stats.judge_accuracy,
