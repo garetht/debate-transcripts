@@ -90,6 +90,8 @@ export function DebateIdentifierHeatmap({row}: {row: FullDebateAnalysisRow}): JS
             fill: "count",
             inset: 0,
             tip: {
+              lineWidth: Infinity,
+              textOverflow: null,
               format: {
                 x: false,
                 y: false,
