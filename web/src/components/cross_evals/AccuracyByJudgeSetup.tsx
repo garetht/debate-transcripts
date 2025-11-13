@@ -81,7 +81,7 @@ export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX
             x: 'label',
             y: 'accuracy',
             fill: (d) => d.judgeTrainingRound,
-            r: 5,
+            r: 3,
             tip: {
               fontSize: 13,
               lineHeight: 1.25,

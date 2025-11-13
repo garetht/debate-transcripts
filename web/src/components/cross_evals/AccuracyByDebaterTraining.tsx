@@ -1,11 +1,20 @@
 import {useCallback} from 'react'
 import type {JSX} from 'react'
 import * as Plot from '@observablehq/plot'
+import type {SymbolType} from '@observablehq/plot'
 import type {DebateDataset} from '../../parquetLoader'
 import type {FullDebateAnalysisRow as DataT} from '../../fullDebateAnalysis.generated.ts'
 import {ResponsivePlot, type PlotRenderer} from '../ResponsivePlot'
 
 const TRAINING_DOMAIN = ['SFT_ONLY', 'ROUND_TWO_DPO', 'RFT'] as const
+
+const ERROR_BAR_CAP_SYMBOL: SymbolType = {
+  draw(context: CanvasRenderingContext2D, _size: number) {
+    const halfLength = 6
+    context.moveTo(-halfLength, 0)
+    context.lineTo(halfLength, 0)
+  },
+}
 
 export interface AccuracyByDebaterTrainingProps {
   datasets?: DebateDataset[]
@@ -34,6 +43,27 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
         }
       })
       type PointWithError = (typeof pointsWithError)[number]
+
+      const errorBarSegments = pointsWithError.map((point) => ({
+        x1: point.configuration.debater_training_round,
+        y1: point.lower,
+        x2: point.configuration.debater_training_round,
+        y2: point.upper,
+        debaterModelType: point.configuration.debater_model_type,
+      }))
+
+      const errorBarCaps = pointsWithError.flatMap((point) => [
+        {
+          x: point.configuration.debater_training_round,
+          y: point.lower,
+          debaterModelType: point.configuration.debater_model_type,
+        },
+        {
+          x: point.configuration.debater_training_round,
+          y: point.upper,
+          debaterModelType: point.configuration.debater_model_type,
+        },
+      ])
 
       const extras = Array.from(
         new Set(
@@ -113,6 +143,25 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
             dy: -12,
           }),
           Plot.ruleY([0.45, 0.85], {strokeOpacity: 0.3}),
+          Plot.link(errorBarSegments, {
+            x1: 'x1',
+            y1: 'y1',
+            x2: 'x2',
+            y2: 'y2',
+            stroke: 'debaterModelType',
+            strokeWidth: 1.5,
+            strokeOpacity: 0.6,
+          }),
+          Plot.dot(errorBarCaps, {
+            x: 'x',
+            y: 'y',
+            symbol: ERROR_BAR_CAP_SYMBOL,
+            stroke: 'debaterModelType',
+            strokeWidth: 1.5,
+            strokeOpacity: 0.6,
+            strokeLinecap: 'round',
+            fill: null,
+          }),
           ...(
             connections.length > 0
               ? [
@@ -132,7 +181,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
             x: (d: PointWithError) => d.configuration.debater_training_round,
             y: (d: PointWithError) => d.accuracy,
             fill: (d: PointWithError) => d.configuration.debater_model_type,
-            r: 4,
+            r: 3,
             tip: {
               fontSize: 13,
               lineHeight: 1.25,
