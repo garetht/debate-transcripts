@@ -19,6 +19,22 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
       const points = datasets.flatMap((dataset) => dataset.rows)
       if (points.length === 0) return null
 
+      const pointsWithError = points.map((point) => {
+        const accuracy = point.stats.judge_accuracy ?? 0
+        const standardError = point.stats.judge_standard_error ?? 0
+        const lower = Math.max(0, accuracy - standardError)
+        const upper = Math.min(1, accuracy + standardError)
+
+        return {
+          ...point,
+          accuracy,
+          standardError,
+          lower,
+          upper,
+        }
+      })
+      type PointWithError = (typeof pointsWithError)[number]
+
       const extras = Array.from(
         new Set(
           points
@@ -112,10 +128,18 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
                 ]
               : []
           ),
-          Plot.dot(points, {
-            x: (d: DataT) => d.configuration.debater_training_round,
-            y: (d: DataT) => d.stats.judge_accuracy,
-            fill: (d: DataT) => d.configuration.debater_model_type,
+          Plot.ruleY(pointsWithError, {
+            x: (d: PointWithError) => d.configuration.debater_training_round,
+            y1: (d: PointWithError) => d.lower,
+            y2: (d: PointWithError) => d.upper,
+            stroke: (d: PointWithError) => d.configuration.debater_model_type,
+            strokeWidth: 1.5,
+            strokeOpacity: 0.6,
+          }),
+          Plot.dot(pointsWithError, {
+            x: (d: PointWithError) => d.configuration.debater_training_round,
+            y: (d: PointWithError) => d.accuracy,
+            fill: (d: PointWithError) => d.configuration.debater_model_type,
             r: 4,
             tip: {
               fontSize: 13,
@@ -123,17 +147,19 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
               textOverflow: 'ellipsis-end',
               format: {
                 x: false,
-                y: false,
+                y: (accuracy: number) => `${(accuracy * 100).toFixed(1)}%`,
                 fill: false,
+                'Standard Error': (value: number) => `${(value * 100).toFixed(1)}%`,
               },
             },
             channels: {
-              Task: (d: DataT) => d.configuration.task_type,
-              'Debater Model': (d: DataT) => d.configuration.debater_base_model,
-              'Debater Training': (d: DataT) => d.configuration.debater_training_round,
-              'Judge Model': (d: DataT) => d.configuration.judge_base_model,
-              'Judge Training': (d: DataT) => d.configuration.judge_training_round,
-              'Judge Accuracy': (d: DataT) => d.stats.judge_accuracy,
+              Task: (d: PointWithError) => d.configuration.task_type,
+              'Debater Model': (d: PointWithError) => d.configuration.debater_base_model,
+              'Debater Training': (d: PointWithError) => d.configuration.debater_training_round,
+              'Judge Model': (d: PointWithError) => d.configuration.judge_base_model,
+              'Judge Training': (d: PointWithError) => d.configuration.judge_training_round,
+              'Judge Accuracy': (d: PointWithError) => d.accuracy,
+              'Standard Error': (d: PointWithError) => d.standardError,
             },
           }),
         ],

@@ -65,7 +65,7 @@ export function App(): JSX.Element {
   return (
     <main className="flex flex-col gap-6 text-left">
       {selected ? (
-        <DetailScreen dataset={selected.dataset} row={selected.row} onBack={handleBack} />
+        <DetailScreen row={selected.row} onBack={handleBack} />
       ) : (
         <>
           <header className="space-y-2">

@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-import {existsSync, mkdirSync, readFileSync, statSync, writeFileSync,} from 'node:fs'
-import path from 'node:path'
-import process from 'node:process'
+import {existsSync, mkdirSync, readFileSync, statSync, writeFileSync} from 'node:fs'
+import * as path from 'node:path'
 import {parquetMetadata, parquetSchema, type SchemaElement, type SchemaTree,} from 'hyparquet'
 import {Project} from 'ts-morph'
 

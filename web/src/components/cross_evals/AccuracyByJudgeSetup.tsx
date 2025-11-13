@@ -23,11 +23,11 @@ export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX
         const se = row.stats.judge_standard_error ?? 0
         const lower = Math.max(0, accuracy - se)
         const upper = Math.min(1, accuracy + se)
-        const label = `${row.configuration.judge_model_type} · ${row.configuration.judge_training_round}`
+        const label = `${row.configuration.judge_base_model} · ${row.configuration.judge_training_round}`
 
         return {
           label,
-          judgeModelType: row.configuration.judge_model_type,
+          judgeBaseModel: row.configuration.judge_base_model,
           judgeTrainingRound: row.configuration.judge_training_round,
           accuracy,
           lower,
@@ -44,10 +44,10 @@ export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX
       )
 
       return {
-        height: 400,
+        height: 420,
         width: Math.max(width, 640),
         inset: 12,
-        marginBottom: 120,
+        marginBottom: 150,
         style: {fontSize: '14px'},
         color: {label: 'Judge Training Round', legend: true, scheme: 'RdGy'},
         x: {
@@ -93,7 +93,7 @@ export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX
               },
             },
             channels: {
-              'Judge Model': (d) => d.judgeModelType,
+              'Judge Base Model': (d) => d.judgeBaseModel,
               'Judge Training': (d) => d.judgeTrainingRound,
               'Judge Accuracy': (d) => `${(d.accuracy * 100).toFixed(1)}%`,
               'Standard Error': (d) => `${((d.upper - d.lower) / 2 * 100).toFixed(1)}%`,

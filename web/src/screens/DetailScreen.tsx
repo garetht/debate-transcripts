@@ -1,15 +1,12 @@
-import type { JSX } from 'react'
-import type { DebateDataset } from '../parquetLoader'
-import type { FullDebateAnalysisRow } from '../fullDebateAnalysis.generated'
-import { formatJudgeAccuracy } from '../utils/judgeAccuracy'
+import type {JSX} from 'react'
+import type {FullDebateAnalysisRow} from '../fullDebateAnalysis.generated'
+import {formatJudgeAccuracy} from '../utils/judgeAccuracy'
 import {SingleEvaluationGraph} from '../components/single_eval/SingleEvaluationGraph.tsx'
 
 export function DetailScreen({
-  dataset,
   row,
   onBack,
 }: {
-  dataset: DebateDataset
   row: FullDebateAnalysisRow
   onBack: () => void
 }): JSX.Element {
@@ -59,7 +56,7 @@ export function DetailScreen({
             Configuration Detail
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            {dataset.rows[0].configuration.raw_name}
+            {row.configuration.raw_name}
           </p>
         </div>
       </div>
