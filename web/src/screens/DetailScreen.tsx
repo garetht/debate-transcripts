@@ -41,11 +41,7 @@ export function DetailScreen({
     {
       label: 'Judge Accuracy',
       value: formatJudgeAccuracy(row),
-    },
-    {
-      label: 'Judge Standard Error',
-      value: formatJudgeStandardError(row),
-    },
+    }
   ]
 
   return (
@@ -64,7 +60,7 @@ export function DetailScreen({
             Configuration Detail
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            Dataset: {dataset.virtualPath} • {dataset.url}
+            {dataset.rows[0].configuration.raw_name}
           </p>
         </div>
       </div>
@@ -132,10 +128,6 @@ function buildSections(row: FullDebateAnalysisRow): Section[] {
     {
       title: 'Stats',
       entries: toEntries(row.stats),
-    },
-    {
-      title: 'Distribution',
-      entries: toEntries(row.distribution),
     },
     {
       title: 'Lengths',

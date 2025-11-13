@@ -30,6 +30,9 @@ export interface FullDebateAnalysisRow {
     debater_b_probs: number[];
     judge_accuracy: number;
     judge_standard_error: number;
+    debater_a_win_skew: number;
+    debater_a_divergence_from_uniform: bigint;
+    debater_b_divergence_from_uniform: bigint;
   };
   configuration: {
     raw_name: string;

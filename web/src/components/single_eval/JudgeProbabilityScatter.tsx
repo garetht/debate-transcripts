@@ -49,8 +49,8 @@ export function JudgeProbabilityScatter({row}: { row: FullDebateAnalysisRow }): 
               x: 'value',
               y: 'side',
               fill: 'side',
-              r: 5,
-              opacity: 0.8,
+              r: 2,
+              opacity: 0.3,
               tip: {
                 format: {
                   x: (value: number) => value.toFixed(3),

@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import type { DebateDataset } from '../parquetLoader'
+import type { DebateDataset } from '../../parquetLoader'
 import { AccuracyByDebaterTraining } from './AccuracyByDebaterTraining'
 import { AccuracyByJudgeSetup } from './AccuracyByJudgeSetup'
 

@@ -101,6 +101,29 @@ const tableColumns: ColumnDef<FullDebateAnalysisRow, any>[] = [
       }
   ),
   columnHelper.accessor(
+    (row) => {
+      const value = row.stats.debater_a_win_skew
+      return value === undefined || value === null ? null : Number(value)
+    },
+    {
+      id: 'winSkew',
+      header: () => 'Win Skew',
+      cell: (info) => {
+        const value = info.getValue<number | null>()
+        return value == null ? '—' : value.toLocaleString()
+      },
+      enableGlobalFilter: false,
+      sortingFn: (a, b, columnId) => {
+        const valueA = a.getValue<number | null>(columnId)
+        const valueB = b.getValue<number | null>(columnId)
+        if (valueA === null && valueB === null) return 0
+        if (valueA === null) return 1
+        if (valueB === null) return -1
+        return valueA - valueB
+      },
+    }
+  ),
+  columnHelper.accessor(
       (row) => {
         const count = row.distribution?.transcript_count
         return count === undefined || count === null ? null : Number(count)
@@ -162,6 +185,7 @@ const cellClassNameMap: Record<string, string> = {
   totalTranscripts: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
   judgeAccuracy: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
   judgeStandardError: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
+  winSkew: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
   github: defaultCellClassName,
 }
 
