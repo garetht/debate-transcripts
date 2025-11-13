@@ -64,40 +64,38 @@ export function App(): JSX.Element {
 
   return (
     <main className="flex flex-col gap-6 text-left">
-      {selected ? (
-        <DetailScreen row={selected.row} onBack={handleBack} />
-      ) : (
-        <>
-          <header className="space-y-2">
-            <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-              Debater Evaluation Results
-            </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-300">{state.message}</p>
-          </header>
-          <section id="dataset-list" className="flex flex-col gap-5">
-            {state.status === 'success' ? (
-              datasets.map((dataset) => (
-                <DatasetCard
-                  key={dataset.virtualPath}
-                  dataset={dataset}
-                  onSelectRow={handleSelectRow}
-                  onFilteredRowsChange={(rows, currentDataset) =>
-                    handleFilteredRowsChange(currentDataset, rows)
-                  }
-                />
-              ))
-            ) : state.status === 'loading' ? (
-              <PlaceholderCard message="Fetching datasets…" />
-            ) : state.status === 'empty' ? (
-              <PlaceholderCard message="No datasets available to display." />
-            ) : (
-              <PlaceholderCard message="Unable to display datasets." tone="error" />
-            )}
-          </section>
+      <div className={selected ? 'hidden' : 'flex flex-col gap-6'}>
+        <header className="space-y-2">
+          <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            Debater Evaluation Results
+          </h1>
+          <p className="text-sm text-slate-600 dark:text-slate-300">{state.message}</p>
+        </header>
+        <section id="dataset-list" className="flex flex-col gap-5">
+          {state.status === 'success' ? (
+            datasets.map((dataset) => (
+              <DatasetCard
+                key={dataset.virtualPath}
+                dataset={dataset}
+                onSelectRow={handleSelectRow}
+                onFilteredRowsChange={(rows, currentDataset) =>
+                  handleFilteredRowsChange(currentDataset, rows)
+                }
+              />
+            ))
+          ) : state.status === 'loading' ? (
+            <PlaceholderCard message="Fetching datasets…" />
+          ) : state.status === 'empty' ? (
+            <PlaceholderCard message="No datasets available to display." />
+          ) : (
+            <PlaceholderCard message="Unable to display datasets." tone="error" />
+          )}
+        </section>
 
-          <AllEvaluationsGraphs datasets={datasetsForGraphs} />
-        </>
-      )}
+        <AllEvaluationsGraphs datasets={datasetsForGraphs} />
+      </div>
+
+      {selected ? <DetailScreen row={selected.row} onBack={handleBack} /> : null}
     </main>
   )
 }
