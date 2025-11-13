@@ -2,7 +2,6 @@ import type { JSX } from 'react'
 import type { DebateDataset } from '../parquetLoader'
 import type { FullDebateAnalysisRow } from '../fullDebateAnalysis.generated'
 import { formatJudgeAccuracy } from '../utils/judgeAccuracy'
-import {formatJudgeStandardError} from "../utils/judgeStandardError.ts";
 import {SingleEvaluationGraph} from '../components/single_eval/SingleEvaluationGraph.tsx'
 
 export function DetailScreen({
