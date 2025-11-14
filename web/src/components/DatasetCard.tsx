@@ -15,7 +15,7 @@ export function DatasetCard({
   const { rows } = dataset
 
   return (
-    <article className="group w-full bg-white/80 shadow-card duration-200 dark:bg-slate-900/60">
+    <article className="group w-full max-w-none space-y-3 bg-transparent duration-200">
       <p className="text-sm text-slate-600 transition-colors dark:text-slate-300">{`${rows.length} evaluation${
         rows.length === 1 ? '' : 's'
       }.`}</p>

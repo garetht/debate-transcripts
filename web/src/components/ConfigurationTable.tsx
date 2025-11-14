@@ -584,8 +584,8 @@ export function ConfigurationTable({
     typeof table.getState().globalFilter === 'string' ? table.getState().globalFilter : ''
 
   return (
-    <div className="mt-3">
-      <div className="flex flex-wrap items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-200">
+    <div className="mt-2 space-y-3">
+      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-200">
         <div className="flex flex-wrap items-center gap-2 uppercase">
           <span>Filter</span>
           <button
@@ -623,72 +623,78 @@ export function ConfigurationTable({
           </button>
         </div>
       </div>
-      {tableRows.length > 0 ? (
-        <table className="min-w-full table-auto divide-y divide-slate-200 dark:divide-slate-800">
-          <thead className="bg-slate-100/80 text-left text-xs font-semibold uppercase text-slate-600 dark:bg-slate-800/60 dark:text-slate-200">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} scope="col" className={headerClassName}>
-                    {header.isPlaceholder ? null : header.column.getCanSort() ? (
-                      <button
-                        type="button"
-                        onClick={header.column.getToggleSortingHandler()}
-                        className="flex items-center gap-1 text-left text-slate-600 transition-colors hover:text-indigo-600 focus:outline-none focus-visible:text-indigo-600 dark:text-slate-200 dark:hover:text-indigo-200 dark:focus-visible:text-indigo-200"
-                      >
-                        <span className="uppercase">
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </span>
-                        <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
-                          {header.column.getIsSorted() === 'asc'
-                            ? '^'
-                            : header.column.getIsSorted() === 'desc'
-                            ? 'v'
-                            : ''}
-                        </span>
-                      </button>
-                    ) : (
-                      <span className="uppercase">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </span>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-            {tableRows.map((row) => (
-              <tr
-                key={row.id}
-                tabIndex={0}
-                role="button"
-                onClick={() => onSelectRow(row.original)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    onSelectRow(row.original)
-                  }
-                }}
-                className="cursor-pointer transition-colors hover:bg-indigo-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 dark:hover:bg-indigo-500/20"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className={cellClassNameMap[cell.column.id] ?? defaultCellClassName}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p className="px-4 py-5 text-sm text-slate-600 dark:text-slate-300">
-          No rows match the current filters.
-        </p>
-      )}
+      <div className="w-full">
+        {tableRows.length > 0 ? (
+          <div className="rounded-xl border border-slate-200/70 bg-white/80 shadow-card ring-1 ring-black/5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div className="overflow-x-auto md:overflow-visible">
+              <table className="min-w-full table-auto divide-y divide-slate-200 dark:divide-slate-800">
+                <thead className="bg-slate-100/80 text-left text-xs font-semibold uppercase text-slate-600 dark:bg-slate-800/60 dark:text-slate-200">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <th key={header.id} scope="col" className={headerClassName}>
+                          {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                            <button
+                              type="button"
+                              onClick={header.column.getToggleSortingHandler()}
+                              className="flex items-center gap-1 text-left text-slate-600 transition-colors hover:text-indigo-600 focus:outline-none focus-visible:text-indigo-600 dark:text-slate-200 dark:hover:text-indigo-200 dark:focus-visible:text-indigo-200"
+                            >
+                              <span className="uppercase">
+                                {flexRender(header.column.columnDef.header, header.getContext())}
+                              </span>
+                              <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
+                                {header.column.getIsSorted() === 'asc'
+                                  ? '^'
+                                  : header.column.getIsSorted() === 'desc'
+                                  ? 'v'
+                                  : ''}
+                              </span>
+                            </button>
+                          ) : (
+                            <span className="uppercase">
+                              {flexRender(header.column.columnDef.header, header.getContext())}
+                            </span>
+                          )}
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                  {tableRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      tabIndex={0}
+                      role="button"
+                      onClick={() => onSelectRow(row.original)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          onSelectRow(row.original)
+                        }
+                      }}
+                      className="cursor-pointer transition-colors hover:bg-indigo-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 dark:hover:bg-indigo-500/20"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          key={cell.id}
+                          className={cellClassNameMap[cell.column.id] ?? defaultCellClassName}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-slate-200/70 bg-white/80 px-4 py-4 text-sm text-slate-600 shadow-card ring-1 ring-black/5 dark:border-slate-700/60 dark:bg-slate-900/60 dark:text-slate-300">
+            No rows match the current filters.
+          </div>
+        )}
+      </div>
     </div>
   )
 }
