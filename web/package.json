@@ -29,6 +29,8 @@
     "@types/d3-scale-chromatic": "^3.1.0",
     "hyparquet": "^1.20.2",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-router": "^7.9.6",
+    "react-router-dom": "^7.9.6"
   }
 }
