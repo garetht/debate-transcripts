@@ -1,18 +1,15 @@
 import { useMemo } from 'react'
 import type { FullDebateAnalysisRow } from '../../fullDebateAnalysis.generated'
 
-export function useFilteredRows(
-  rows: FullDebateAnalysisRow[],
-  hideLojbanTasks: boolean,
-): FullDebateAnalysisRow[] {
+export type TaskFilter = 'quality' | 'lojban'
+
+export function useFilteredRows(rows: FullDebateAnalysisRow[], filter: TaskFilter): FullDebateAnalysisRow[] {
   return useMemo(() => {
-    if (!hideLojbanTasks) {
-      return rows
-    }
+    const normalizedFilter = filter.toLowerCase()
 
     return rows.filter((row) => {
       const taskType = row.configuration?.task_type?.trim().toLowerCase()
-      return taskType !== 'lojban'
+      return taskType === normalizedFilter
     })
-  }, [hideLojbanTasks, rows])
+  }, [filter, rows])
 }

@@ -6,7 +6,6 @@ import type {DebateDataset} from '../../parquetLoader'
 import type {FullDebateAnalysisRow as DataT} from '../../fullDebateAnalysis.generated.ts'
 import {ResponsivePlot, type PlotRenderer} from '../ResponsivePlot'
 
-const TRAINING_DOMAIN = ['SFT_ONLY', 'ROUND_TWO_DPO', 'RFT'] as const
 
 const ERROR_BAR_CAP_SYMBOL: SymbolType = {
   draw(context: CanvasRenderingContext2D, _size: number) {
@@ -50,6 +49,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
         x2: point.configuration.debater_training_round,
         y2: point.upper,
         debaterModelType: point.configuration.debater_model_type,
+        judgeBaseModel: point.configuration.judge_base_model,
       }))
 
       const errorBarCaps = pointsWithError.flatMap((point) => [
@@ -57,60 +57,79 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
           x: point.configuration.debater_training_round,
           y: point.lower,
           debaterModelType: point.configuration.debater_model_type,
+          judgeBaseModel: point.configuration.judge_base_model,
         },
         {
           x: point.configuration.debater_training_round,
           y: point.upper,
           debaterModelType: point.configuration.debater_model_type,
+          judgeBaseModel: point.configuration.judge_base_model,
         },
       ])
 
-      const extras = Array.from(
+      const trainings = Array.from(
         new Set(
           points
             .map((point) => point.configuration.debater_training_round)
-            .filter(
-              (round) => !TRAINING_DOMAIN.includes(round as (typeof TRAINING_DOMAIN)[number]),
-            ),
         ),
       )
-      const trainingDomain = [...TRAINING_DOMAIN, ...extras]
+      const trainingDomain = [...trainings]
 
-      const connectionsMap = new Map<
-        string,
-        {
-          sft?: DataT
-          dpo?: DataT
-          debaterModelType?: DataT['configuration']['debater_model_type']
-        }
-      >()
-
-      for (const point of points) {
-        const {debater_training_round, debater_base_model, judge_base_model, judge_training_round, debater_model_type} =
-          point.configuration
-        if (debater_training_round !== 'SFT_ONLY' && debater_training_round !== 'ROUND_TWO_DPO') continue
-        const key = [debater_base_model, judge_base_model, judge_training_round].join('::')
-        const existing = connectionsMap.get(key) ?? {}
-        if (debater_training_round === 'SFT_ONLY') {
-          existing.sft = point
-        } else {
-          existing.dpo = point
-        }
-        if (!existing.debaterModelType) {
-          existing.debaterModelType = debater_model_type
-        }
-        connectionsMap.set(key, existing)
+      type ConnectionAccumulator = {
+        fromPoint?: DataT
+        toPoint?: DataT
+        debaterModelType?: DataT['configuration']['debater_model_type']
+        judgeBaseModel?: DataT['configuration']['judge_base_model']
       }
 
-      const connections = Array.from(connectionsMap.values())
-        .filter(({sft, dpo}) => sft && dpo)
-        .map(({sft, dpo, debaterModelType}) => ({
-          x1: 'SFT_ONLY',
-          y1: sft!.stats.judge_accuracy,
-          x2: 'ROUND_TWO_DPO',
-          y2: dpo!.stats.judge_accuracy,
-          debaterModelType: debaterModelType ?? sft!.configuration.debater_model_type,
-        }))
+      const connectionPairs: Array<{
+        fromRound: DataT['configuration']['debater_training_round']
+        toRound: DataT['configuration']['debater_training_round']
+      }> = [
+        {fromRound: 'SFT_ONLY', toRound: 'ROUND_TWO_DPO'},
+        {fromRound: 'UNTRAINED', toRound: 'RFT'},
+      ]
+
+      const connections = connectionPairs.flatMap(({fromRound, toRound}) => {
+        const map = new Map<string, ConnectionAccumulator>()
+
+        for (const point of points) {
+          const {
+            debater_training_round,
+            debater_base_model,
+            judge_base_model,
+            judge_training_round,
+            debater_model_type,
+          } = point.configuration
+          if (debater_training_round !== fromRound && debater_training_round !== toRound) continue
+
+          const key = [fromRound, toRound, debater_base_model, judge_base_model, judge_training_round].join('::')
+          const existing = map.get(key) ?? {}
+          if (debater_training_round === fromRound) {
+            existing.fromPoint = point
+          } else {
+            existing.toPoint = point
+          }
+          if (!existing.debaterModelType) {
+            existing.debaterModelType = debater_model_type
+          }
+          if (!existing.judgeBaseModel) {
+            existing.judgeBaseModel = point.configuration.judge_base_model
+          }
+          map.set(key, existing)
+        }
+
+        return Array.from(map.values())
+          .filter(({fromPoint, toPoint}) => fromPoint && toPoint)
+          .map(({fromPoint, toPoint, debaterModelType, judgeBaseModel}) => ({
+            x1: fromRound,
+            y1: fromPoint!.stats.judge_accuracy,
+            x2: toRound,
+            y2: toPoint!.stats.judge_accuracy,
+            debaterModelType: debaterModelType ?? fromPoint!.configuration.debater_model_type,
+            judgeBaseModel: judgeBaseModel ?? fromPoint!.configuration.judge_base_model,
+          }))
+      })
 
       return {
         height: 360,
@@ -132,7 +151,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
           domain: [0.45, 0.95],
         },
         color: {
-          label: 'Debater Model Type',
+          label: 'Judge Model',
           legend: true,
         },
         marks: [
@@ -148,7 +167,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
             y1: 'y1',
             x2: 'x2',
             y2: 'y2',
-            stroke: 'debaterModelType',
+            stroke: 'judgeBaseModel',
             strokeWidth: 1.5,
             strokeOpacity: 0.6,
           }),
@@ -156,7 +175,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
             x: 'x',
             y: 'y',
             symbol: ERROR_BAR_CAP_SYMBOL,
-            stroke: 'debaterModelType',
+            stroke: 'judgeBaseModel',
             strokeWidth: 1.5,
             strokeOpacity: 0.6,
             strokeLinecap: 'round',
@@ -170,7 +189,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
                     y1: 'y1',
                     x2: 'x2',
                     y2: 'y2',
-                    stroke: 'debaterModelType',
+                    stroke: 'judgeBaseModel',
                     strokeWidth: 1.5,
                     strokeOpacity: 0.6,
                   }),
@@ -180,7 +199,8 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
           Plot.dot(pointsWithError, {
             x: (d: PointWithError) => d.configuration.debater_training_round,
             y: (d: PointWithError) => d.accuracy,
-            fill: (d: PointWithError) => d.configuration.debater_model_type,
+            fill: (d: PointWithError) => d.configuration.judge_base_model,
+            stroke: (d: PointWithError) => d.configuration.judge_base_model,
             r: 3,
             tip: {
               fontSize: 13,

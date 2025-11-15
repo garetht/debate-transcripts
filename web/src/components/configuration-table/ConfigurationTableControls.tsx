@@ -1,39 +1,53 @@
 import type { JSX } from 'react'
 import type { CopyStatus } from './useClipboardExporter'
+import type { TaskFilter } from './useFilteredRows'
 
 export function ConfigurationTableControls({
-  hideLojbanTasks,
-  onToggleHideLojbanTasks,
+  taskFilter,
+  onTaskFilterChange,
   currentFilter,
   onFilterChange,
   onCopyTable,
   copyStatus,
   disableCopy,
 }: {
-  hideLojbanTasks: boolean
-  onToggleHideLojbanTasks: () => void
+  taskFilter: TaskFilter
+  onTaskFilterChange: (value: TaskFilter) => void
   currentFilter: string
   onFilterChange: (value: string) => void
   onCopyTable: () => void
   copyStatus: CopyStatus
   disableCopy: boolean
 }): JSX.Element {
+  const tabs: Array<{ label: string; value: TaskFilter }> = [
+    { label: 'Quality', value: 'quality' },
+    { label: 'Lojban', value: 'lojban' },
+  ]
+
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-200">
       <div className="flex flex-wrap items-center gap-2 uppercase">
-        <span>Filter</span>
-        <button
-          type="button"
-          onClick={onToggleHideLojbanTasks}
-          aria-pressed={hideLojbanTasks}
-          className={`rounded-md border px-2 py-1 text-[11px] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
-            hideLojbanTasks
-              ? 'border-indigo-500 bg-indigo-500 text-white hover:bg-indigo-600 dark:border-indigo-400 dark:bg-indigo-400 dark:hover:bg-indigo-300'
-              : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800'
-          }`}
-        >
-          {hideLojbanTasks ? 'Show Lobjan Tasks' : 'Hide Lojban Tasks'}
-        </button>
+        <span>Tasks</span>
+        <div className="flex rounded-md border border-slate-300 bg-white p-0.5 text-[11px] dark:border-slate-700 dark:bg-slate-900">
+          {tabs.map(({ label, value }) => {
+            const isActive = taskFilter === value
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => onTaskFilterChange(value)}
+                aria-pressed={isActive}
+                className={`rounded px-3 py-1 font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+                  isActive
+                    ? 'bg-indigo-500 text-white hover:bg-indigo-600 dark:bg-indigo-400 dark:text-slate-900'
+                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                }`}
+              >
+                {label}
+              </button>
+            )
+          })}
+        </div>
       </div>
       <input
         value={currentFilter}

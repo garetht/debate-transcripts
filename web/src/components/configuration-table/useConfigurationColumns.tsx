@@ -23,7 +23,7 @@ const numericSortingFn: SortingFnOption<FullDebateAnalysisRow> = (a, b, columnId
 }
 
 export const headerClassName = 'px-3 py-2'
-export const defaultCellClassName = 'px-3 py-2 text-sm text-slate-700 dark:text-slate-200'
+export const defaultCellClassName = 'px-3 py-2 text-[13px] text-slate-700 dark:text-slate-200'
 export const cellClassNameMap: Record<string, string> = {
   taskType: defaultCellClassName,
   debater: defaultCellClassName,

@@ -17,7 +17,7 @@ import {
   headerClassName,
   useConfigurationColumns,
 } from './configuration-table/useConfigurationColumns'
-import { useFilteredRows } from './configuration-table/useFilteredRows'
+import { useFilteredRows, type TaskFilter } from './configuration-table/useFilteredRows'
 import { useFilteredRowsReporter } from './configuration-table/useFilteredRowsReporter'
 import { useJudgeAccuracyDomain, useWinSkewDomain } from './configuration-table/domains'
 import { stringIncludesCaseInsensitive } from './configuration-table/filters'
@@ -33,9 +33,9 @@ export function ConfigurationTable({
 }): JSX.Element {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
-  const [hideLojbanTasks, setHideLojbanTasks] = useState(true)
+  const [taskFilter, setTaskFilter] = useState<TaskFilter>('quality')
 
-  const filteredRows = useFilteredRows(rows, hideLojbanTasks)
+  const filteredRows = useFilteredRows(rows, taskFilter)
   const judgeAccuracyDomain = useJudgeAccuracyDomain(rows)
   const winSkewDomain = useWinSkewDomain(rows)
   const tableColumns = useConfigurationColumns({ judgeAccuracyDomain, winSkewDomain })
@@ -65,8 +65,8 @@ export function ConfigurationTable({
   return (
     <div className="mt-2 space-y-3">
       <ConfigurationTableControls
-        hideLojbanTasks={hideLojbanTasks}
-        onToggleHideLojbanTasks={() => setHideLojbanTasks((current) => !current)}
+        taskFilter={taskFilter}
+        onTaskFilterChange={setTaskFilter}
         currentFilter={currentFilter}
         onFilterChange={(value) => table.setGlobalFilter(value)}
         onCopyTable={handleCopyTable}
