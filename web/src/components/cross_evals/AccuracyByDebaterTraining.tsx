@@ -129,7 +129,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
           label: 'Judge Accuracy',
           labelOffset: 36,
           grid: true,
-          domain: [0.45, 0.85],
+          domain: [0.45, 0.95],
         },
         color: {
           label: 'Debater Model Type',
@@ -142,7 +142,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
             fontSize: 16,
             dy: -12,
           }),
-          Plot.ruleY([0.45, 0.85], {strokeOpacity: 0.3}),
+          Plot.ruleY([0.45, 0.95], {strokeOpacity: 0.3}),
           Plot.link(errorBarSegments, {
             x1: 'x1',
             y1: 'y1',

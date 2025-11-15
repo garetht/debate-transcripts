@@ -278,7 +278,7 @@ export function ConfigurationTable({
         },
         {
           id: 'winSkew',
-          header: () => 'Win Skew',
+          header: () => 'Bias to A',
           cell: (info) => {
             const value = info.getValue<number | null>()
             const displayValue =
@@ -307,7 +307,7 @@ export function ConfigurationTable({
             return valueA - valueB
           },
           meta: {
-            exportLabel: 'Win Skew',
+            exportLabel: 'Bias to A',
             exportValue: (row: FullDebateAnalysisRow) => {
               const value = row.stats.debater_a_win_skew
               if (value === undefined || value === null) {
