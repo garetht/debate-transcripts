@@ -9,6 +9,7 @@ export function DebaterWinSkew({row}: {row: FullDebateAnalysisRow}): JSX.Element
     (width) => {
       const divergenceA = Number(row.stats.debater_a_divergence_from_uniform ?? 0n);
       const divergenceB = Number(row.stats.debater_b_divergence_from_uniform ?? 0n);
+      const transcriptCount = Number(row.distribution.transcript_count ?? 0n);
       if (divergenceA === 0 && divergenceB === 0) return null;
 
       const data = [
@@ -44,7 +45,7 @@ export function DebaterWinSkew({row}: {row: FullDebateAnalysisRow}): JSX.Element
           label: "Δ wins vs uniform",
           grid: true,
           nice: true,
-          domain: [-row.distribution.transcript_count / BigInt(4), row.distribution.transcript_count / BigInt(4)],
+          domain: [-transcriptCount / 4, transcriptCount / 4],
         },
         y: {
           label: "",
@@ -100,6 +101,7 @@ export function DebaterWinSkew({row}: {row: FullDebateAnalysisRow}): JSX.Element
     [
       row.stats.debater_a_divergence_from_uniform,
       row.stats.debater_b_divergence_from_uniform,
+      row.distribution.transcript_count,
     ],
   );
 

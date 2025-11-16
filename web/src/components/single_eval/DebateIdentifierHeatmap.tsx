@@ -42,6 +42,7 @@ export function DebateIdentifierHeatmap({row}: {row: FullDebateAnalysisRow}): JS
       const cellSize = Math.max(8, Math.min(14, Math.floor(availableWidth / columnCount)));
       const heatmapWidth = cellSize * columnCount;
       const heatmapHeight = cellSize * rowCount;
+      const maxIdentifierLength = Math.max(...data.map(datum => datum.identifier.length))
 
       return {
         width: Math.max(width, heatmapWidth + 80),
@@ -90,8 +91,8 @@ export function DebateIdentifierHeatmap({row}: {row: FullDebateAnalysisRow}): JS
             fill: "count",
             inset: 0,
             tip: {
-              lineWidth: Infinity,
-              textOverflow: null,
+              lineWidth: maxIdentifierLength > 550 ? 20 : Infinity,
+              textOverflow: maxIdentifierLength > 550 ? "ellipsis-end" : null,
               format: {
                 x: false,
                 y: false,
