@@ -30,7 +30,6 @@ export const cellClassNameMap: Record<string, string> = {
   debaterTrainingRound: 'px-2.5 py-2 text-xs text-slate-600 dark:text-slate-300',
   judge: defaultCellClassName,
   judgeTrainingRound: 'px-2.5 py-2 text-xs text-slate-600 dark:text-slate-300',
-  emptyDebates: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
   totalTranscripts: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
   judgeAccuracy: 'px-3 py-2 text-xs font-medium text-right',
   judgeStandardError: 'px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-300',
@@ -243,32 +242,6 @@ export function useConfigurationColumns({
                 return ''
               }
               return numeric.toLocaleString()
-            },
-          },
-        },
-      ),
-      columnHelper.accessor(
-        (row) => {
-          const emptyDebates = row.emptiness?.unique_empty_files?.length
-          return emptyDebates === undefined ? null : emptyDebates
-        },
-        {
-          id: 'emptyDebates',
-          header: () => '# Empty',
-          cell: (info) => {
-            const value = info.getValue<number | null>()
-            return value == null ? '—' : value.toLocaleString()
-          },
-          enableGlobalFilter: false,
-          sortingFn: numericSortingFn,
-          meta: {
-            exportLabel: '# Empty',
-            exportValue: (row: FullDebateAnalysisRow) => {
-              const emptyDebates = row.emptiness?.unique_empty_files?.length
-              if (emptyDebates === undefined) {
-                return ''
-              }
-              return emptyDebates.toLocaleString()
             },
           },
         },

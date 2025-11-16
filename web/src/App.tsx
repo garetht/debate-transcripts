@@ -9,12 +9,12 @@ import type { FullDebateAnalysisRow } from './fullDebateAnalysis.generated'
 import { DetailScreen } from './screens/DetailScreen'
 import { AllEvaluationsGraphs } from './components/cross_evals/AllEvaluationsGraphs.tsx'
 
-type FilteredDatasetMap = Record<string, number[]>
-
 export function App(): JSX.Element {
   const { datasets, state } = useDebateDatasets()
   const navigate = useNavigate()
-  const [filteredRowsByDataset, setFilteredRowsByDataset] = useState<FilteredDatasetMap>({})
+  const [filteredRowsByDataset, setFilteredRowsByDataset] = useState<
+    Record<string, FullDebateAnalysisRow[]>
+  >({})
 
   const handleSelectRow = useCallback(
     (row: FullDebateAnalysisRow) => {
@@ -35,14 +35,11 @@ export function App(): JSX.Element {
   const handleFilteredRowsChange = useCallback(
     (dataset: DebateDataset, rows: FullDebateAnalysisRow[]) => {
       setFilteredRowsByDataset((previous) => {
-        const indices = rows
-          .map((row) => dataset.rows.indexOf(row))
-          .filter((index): index is number => index >= 0)
         const existing = previous[dataset.virtualPath]
         const hasSameRows =
           existing !== undefined &&
-          existing.length === indices.length &&
-          existing.every((index, position) => index === indices[position])
+          existing.length === rows.length &&
+          existing.every((row, index) => row === rows[index])
 
         if (hasSameRows) {
           return previous
@@ -50,7 +47,7 @@ export function App(): JSX.Element {
 
         return {
           ...previous,
-          [dataset.virtualPath]: indices,
+          [dataset.virtualPath]: rows,
         }
       })
     },
@@ -63,13 +60,10 @@ export function App(): JSX.Element {
     }
 
     return datasets.map((dataset) => {
-      const filteredIndices = filteredRowsByDataset[dataset.virtualPath]
-      if (!filteredIndices) {
+      const filteredRows = filteredRowsByDataset[dataset.virtualPath]
+      if (!filteredRows) {
         return dataset
       }
-      const filteredRows = filteredIndices
-        .map((index) => dataset.rows[index])
-        .filter((row): row is FullDebateAnalysisRow => row !== undefined)
       return {
         ...dataset,
         rows: filteredRows,
