@@ -3,6 +3,24 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './style.css'
 
+declare global {
+  // Allows JSON.stringify to serialize bigint values without throwing.
+  interface BigInt {
+    toJSON?: () => string
+  }
+}
+
+
+const bigintPrototype = BigInt.prototype as BigInt & { toJSON?: () => string }
+if (typeof bigintPrototype.toJSON !== 'function') {
+  Object.defineProperty(BigInt.prototype, 'toJSON', {
+    value() {
+      return this.toString()
+    },
+    configurable: true,
+  })
+}
+
 function resolveBasePath(): string {
   const { pathname } = new URL(document.baseURI)
   if (pathname === '/' || pathname === '') {

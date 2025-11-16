@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { JSX } from 'react'
 import {
   flexRender,
@@ -33,7 +34,21 @@ export function ConfigurationTable({
 }): JSX.Element {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
-  const [taskFilter, setTaskFilter] = useState<TaskFilter>('quality')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const taskFilter = parseTaskFilter(searchParams.get('taskType'))
+
+  const handleTaskFilterChange = useCallback(
+    (value: TaskFilter) => {
+      if (searchParams.get('taskType') === value) {
+        return
+      }
+      const nextParams = new URLSearchParams(searchParams)
+      nextParams.set('taskType', value)
+      setSearchParams(nextParams)
+    },
+    [searchParams, setSearchParams],
+  )
 
   const filteredRows = useFilteredRows(rows, taskFilter)
   const judgeAccuracyDomain = useJudgeAccuracyDomain(rows)
@@ -66,7 +81,7 @@ export function ConfigurationTable({
     <div className="mt-2 space-y-3">
       <ConfigurationTableControls
         taskFilter={taskFilter}
-        onTaskFilterChange={setTaskFilter}
+        onTaskFilterChange={handleTaskFilterChange}
         currentFilter={currentFilter}
         onFilterChange={(value) => table.setGlobalFilter(value)}
         onCopyTable={handleCopyTable}
@@ -147,4 +162,14 @@ export function ConfigurationTable({
       </div>
     </div>
   )
+}
+
+const DEFAULT_TASK_FILTER: TaskFilter = 'quality'
+
+function parseTaskFilter(value: string | null): TaskFilter {
+  if (value === 'quality' || value === 'lojban') {
+    return value
+  }
+
+  return DEFAULT_TASK_FILTER
 }
