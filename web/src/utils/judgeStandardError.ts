@@ -1,5 +1,9 @@
-import type { FullDebateAnalysisRow } from '../fullDebateAnalysis.generated'
+type JudgeStandardErrorSource = {
+  stats: {
+    judge_standard_error: number
+  }
+}
 
-export function formatJudgeStandardError(row: FullDebateAnalysisRow): string {
+export function formatJudgeStandardError(row: JudgeStandardErrorSource): string {
   return `${row.stats.judge_standard_error.toFixed(3)}`
 }
