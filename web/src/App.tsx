@@ -111,7 +111,7 @@ export function App(): JSX.Element {
                 )}
               </section>
 
-              <AllEvaluationsGraphs datasets={datasetsForGraphs} />
+              <AllEvaluationsGraphs datasets={datasets} filteredDatasets={datasetsForGraphs} />
             </div>
           }
         />

@@ -27,6 +27,20 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
       const points = datasets.flatMap((dataset) => dataset.rows)
       if (points.length === 0) return null
 
+      const uniqueTaskTypes = Array.from(
+        new Set(
+          points
+            .map((point) => point.configuration.task_type?.trim().toLowerCase())
+            .filter((taskType): taskType is string => Boolean(taskType)),
+        ),
+      )
+      const taskTypeLabel =
+        uniqueTaskTypes.length === 1
+          ? uniqueTaskTypes[0]
+          : uniqueTaskTypes.length > 1
+          ? uniqueTaskTypes.join(' / ')
+          : 'unknown task'
+
       const pointsWithError = points.map((point) => {
         const accuracy = point.stats.judge_accuracy ?? 0
         const standardError = point.stats.judge_standard_error ?? 0
@@ -157,7 +171,7 @@ export function AccuracyByDebaterTraining({datasets}: AccuracyByDebaterTrainingP
         marks: [
           Plot.text([null], {
             frameAnchor: 'top',
-            text: () => 'Judge accuracy by debater training',
+            text: () => `Judge accuracy by debater training (${taskTypeLabel})`,
             fontSize: 16,
             dy: -12,
           }),

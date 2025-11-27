@@ -43,6 +43,20 @@ export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX
         a.localeCompare(b),
       )
 
+      const uniqueTaskTypes = Array.from(
+        new Set(
+          data
+            .map((point) => point.taskType?.trim().toLowerCase())
+            .filter((taskType): taskType is string => Boolean(taskType)),
+        ),
+      )
+      const taskTypeLabel =
+        uniqueTaskTypes.length === 1
+          ? uniqueTaskTypes[0]
+          : uniqueTaskTypes.length > 1
+          ? uniqueTaskTypes.join(' / ')
+          : 'unknown task'
+
       return {
         height: 420,
         width: Math.max(width, 640),
@@ -64,7 +78,7 @@ export function AccuracyByJudgeSetup({datasets}: AccuracyByJudgeSetupProps): JSX
         marks: [
           Plot.text([null], {
             frameAnchor: 'top',
-            text: () => 'Judge accuracy by judge setup',
+            text: () => `Judge accuracy by judge setup (${taskTypeLabel})`,
             fontSize: 16,
             dy: -12,
           }),
